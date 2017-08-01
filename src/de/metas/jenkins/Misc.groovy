@@ -11,6 +11,19 @@ String mkDockerTag(String input)
  		.replaceAll('[^a-zA-Z0-9_#\\.]', '_'); // replace everything that's not allowed with an underscore
 }
 
+String getCommitSha1()
+{
+  // getting the commit_sha1 like this is a workaround until https://issues.jenkins-ci.org/browse/JENKINS-26100 is done
+  // thanks to
+  // https://issues.jenkins-ci.org/browse/JENKINS-34455?focusedCommentId=256522&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-256522
+  // for the workaround
+  sh 'git rev-parse HEAD > git-commit-sha1.txt';
+  final commit_sha1 = readFile('git-commit-sha1.txt')
+                        .replaceAll('\\s','') // get rid of all whisespaces
+
+  return commit_sha1
+}
+
 /**
  * This method calls additional downstream jobs such as metasfresh-procurement and metasfresh-webui from metasfresh.
  * Please don't invoke it from within a node block, because it also contains a node block which might need to the pipeline beeing blocked unneccesarily.
@@ -34,6 +47,21 @@ def invokeDownStreamJobs(
 {
 	echo "Invoking downstream job from folder=${jobFolderName} with preferred branch=${upstreamBranch}"
 
+  final String jobName = getEffectiveDownStreamJobName(jobFolderName, upstreamBranch);
+
+	build job: jobName,
+		parameters: [
+			string(name: 'MF_PARENT_VERSION', value: parentPomVersion),
+			string(name: 'MF_UPSTREAM_BRANCH', value: upstreamBranch),
+			string(name: 'MF_UPSTREAM_BUILDNO', value: buildId),
+			booleanParam(name: 'MF_TRIGGER_DOWNSTREAM_BUILDS', value: triggerDownStreamBuilds), // the job shall just run but not trigger further builds because we are doing all the orchestration
+			booleanParam(name: 'MF_SKIP_TO_DIST', value: skipToDist) // this param is only recognised by metasfresh
+		], wait: wait
+}
+
+
+def String getEffectiveDownStreamJobName(final String jobFolderName, final String upstreamBranch)
+{
 	// if this is not the master branch but a feature branch, we need to find out if the "BRANCH_NAME" job exists or not
 	//
 	// Here i'm not checking if the build job exists but if the respective branch on github exists. If the branch is there, then I assume that the multibranch plugin also created the job
@@ -45,10 +73,8 @@ def invokeDownStreamJobs(
 		// Perhaps you forgot to surround the code with a step that provides this, such as: node
 		// ...
 		// org.jenkinsci.plugins.workflow.steps.MissingContextVariableException: Required context class hudson.FilePath is missing
-
 		exitCode = sh returnStatus: true, script: "git ls-remote --exit-code https://github.com/metasfresh/${jobFolderName} ${upstreamBranch}"
 	}
-
 	if(exitCode == 0)
 	{
 		echo "Branch ${upstreamBranch} also exists in ${jobFolderName}"
@@ -71,12 +97,5 @@ def invokeDownStreamJobs(
 	// Jenkins.instance.getAllItems()
 	// but there I got a scurity exception and am not sure if an how I can have a SCM maintained script that is approved by an admin
 
-	build job: jobName,
-		parameters: [
-			string(name: 'MF_PARENT_VERSION', value: parentPomVersion),
-			string(name: 'MF_UPSTREAM_BRANCH', value: upstreamBranch),
-			string(name: 'MF_UPSTREAM_BUILDNO', value: buildId),
-			booleanParam(name: 'MF_TRIGGER_DOWNSTREAM_BUILDS', value: triggerDownStreamBuilds), // the job shall just run but not trigger further builds because we are doing all the orchestration
-			booleanParam(name: 'MF_SKIP_TO_DIST', value: skipToDist) // this param is only recognised by metasfresh
-		], wait: wait
+	return jobName;
 }

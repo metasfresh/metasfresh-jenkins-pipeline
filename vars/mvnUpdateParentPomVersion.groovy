@@ -12,19 +12,17 @@ import de.metas.jenkins.MvnConf;
   */
 def call(final MvnConf mvnConf, final String newParentVersion='LATEST')
 {
-    echo """mvnUpdateParentPomVersion is called with
-  mvnConf=${mvnConf}
-  newParentVersion=${newParentVersion}
-"""
+    echo "mvnUpdateParentPomVersion is called with newParentVersion=${newParentVersion} and mvnConf=${mvnConf}"
 
     if(newParentVersion && newParentVersion!='LATEST')
     {
-       echo "Update the parent pom version to the explicitly given value ${newParentVersion}"
+       // update the parent pom version. Since https://github.com/metasfresh/metasfresh/issues/2102 we have a parent version *range*, therefore, we don't use "update-parent" anymore, but "resolve-ranges"
+       echo "mvnUpdateParentPomVersion: Update the parent pom version to the explicitly given value ${newParentVersion}"
        sh "mvn --settings ${mvnConf.settingsFile} --file ${mvnConf.pomFile} --batch-mode -DallowSnapshots=false -DgenerateBackupPoms=true ${mvnConf.resolveParams} -DparentVersion=[${newParentVersion}] versions:update-parent";
     }
     else
     {
-       echo "Resolve the parent version range"
+       echo "mvnUpdateParentPomVersion: Resolve the parent version range"
        sh "mvn --settings ${mvnConf.settingsFile} --file ${mvnConf.pomFile} --batch-mode -DallowSnapshots=false -DgenerateBackupPoms=true ${mvnConf.resolveParams} -DprocessParent=true versions:resolve-ranges";
     }
 }

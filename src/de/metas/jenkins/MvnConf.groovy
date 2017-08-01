@@ -59,4 +59,9 @@ class MvnConf implements Serializable
 		String mvnDeployRepoURL = "${this.mvnRepoBaseURL}/content/repositories/${this.mvnRepoName}-releases"
 		return "-DaltDeploymentRepository=\"${MF_MAVEN_REPO_ID}::default::${mvnDeployRepoURL}\"";
 	}
+
+	MvnConf withPomFile(String pomFile)
+	{
+		return new MvnConf(pomFile,	this.settingsFile, this.mvnRepoBaseURL,	this.mvnRepoName)
+	}
 }
