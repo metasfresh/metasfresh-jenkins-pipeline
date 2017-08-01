@@ -15,7 +15,7 @@ def call(final MvnConf mvnConf, final String newParentVersion='LATEST')
     echo """mvnUpdateParentPomVersion is called with
 \tmvnConf=${mvnConf}
 \tnewParentVersion=${newParentVersion}
-""";
+"""
 
     if(newParentVersion && newParentVersion!='LATEST')
     {
