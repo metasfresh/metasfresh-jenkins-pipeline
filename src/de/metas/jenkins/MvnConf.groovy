@@ -56,7 +56,8 @@ class MvnConf implements Serializable
 	}
 
 	/**
-	  * @return a string containing a number of "-Dtask-repo-.." maven parameters, used to resolve dependencies from the repos that we want to resolve from
+	  * @return a string containing a number of "-Dtask-repo-.." parameters, used to resolve dependencies from the repos that we want to resolve from.<br>
+		*		IMPORTANT: please note that these are not "real" maven paramters, but properties which we use in the settings.xml file that is provided by jenkins.
 		*/
 	String getResolveParams()
 	{
