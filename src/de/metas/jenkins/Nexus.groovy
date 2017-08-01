@@ -6,36 +6,42 @@ class NexusClient implements Serializable
 
 	final String mvnRepoBaseURL;
 	final String mvnRepoName;
+	final String nexusLogin;
 
 	NexusClient(
 			String mvnRepoBaseURL,
-			String mvnRepoName
+			String mvnRepoName,
+			String nexusLogin
 			)
 	{
 		this.mvnRepoBaseURL = mvnRepoBaseURL
 		this.mvnRepoName = mvnRepoName
 	}
 
+	void createRepoIfNotExists()
+	{
+		if(isRepoExists())
+		{
+			return;
+		}
+		createRepo();
+	}
+
 	boolean isRepoExists()
 	{
-		withCredentials([usernameColonPassword(credentialsId: 'nexus_jenkins', variable: 'NEXUS_LOGIN')])
-		{
 			echo "Check if the nexus repository ${this.mvnRepoName} exists";
 
 			// check if there is a repository for ur branch
-			final String checkForRepoCommand = "curl --silent -X GET -u ${NEXUS_LOGIN} ${this.mvnRepoBaseURL}/service/local/repositories | grep '<id>${this.mvnRepoName}-releases</id>'";
+			final String checkForRepoCommand = "curl --silent -X GET -u ${nexusLogin} ${this.mvnRepoBaseURL}/service/local/repositories | grep '<id>${this.mvnRepoName}-releases</id>'";
 			final grepExitCode = sh returnStatus: true, script: checkForRepoCommand;
 			final repoExists = grepExitCode == 0;
 
 			echo "The nexus repository ${this.mvnRepoName} exists: ${repoExists}";
 			return repoExists;
-		}
 	}
 
 	void createRepo()
 	{
-		withCredentials([usernameColonPassword(credentialsId: 'nexus_jenkins', variable: 'NEXUS_LOGIN')])
-		{
 			echo "Create the repository ${this.mvnRepoName}-releases";
 			final String createHostedRepoPayload = """<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <repository>
@@ -56,7 +62,7 @@ class NexusClient implements Serializable
 """;
 
 			// # nexus ignored application/json
-			final String createHostedRepoCommand =  "curl --silent -H \"Content-Type: application/xml\" -X POST -u ${NEXUS_LOGIN} -d \'${createHostedRepoPayload}\' ${this.mvnRepoBaseURL}/service/local/repositories"
+			final String createHostedRepoCommand =  "curl --silent -H \"Content-Type: application/xml\" -X POST -u ${nexusLogin} -d \'${createHostedRepoPayload}\' ${this.mvnRepoBaseURL}/service/local/repositories"
 			sh "${createHostedRepoCommand}"
 
 			if(this.mvnRepoBaseURL != PUBLIC_REPO_BASE_URL)
@@ -87,7 +93,7 @@ class NexusClient implements Serializable
 """;
 
 				// # nexus ignored application/json
-				final String createProxyRepoCommand =  "curl --silent -H \"Content-Type: application/xml\" -X POST -u ${NEXUS_LOGIN} -d \'${createProxyRepoPayload}\' ${this.mvnRepoBaseURL}/service/local/repositories"
+				final String createProxyRepoCommand =  "curl --silent -H \"Content-Type: application/xml\" -X POST -u ${nexusLogin} -d \'${createProxyRepoPayload}\' ${this.mvnRepoBaseURL}/service/local/repositories"
 				sh "${createProxyRepoCommand}"
 			}
 			else
@@ -139,7 +145,7 @@ class NexusClient implements Serializable
 """
 
 			// # nexus ignored application/json
-			final String createGroupCommand =  "curl --silent -H \"Content-Type: application/xml\" -X POST -u ${NEXUS_LOGIN} -d \'${createGroupPayload}\' ${this.mvnRepoBaseURL}/service/local/repo_groups"
+			final String createGroupCommand =  "curl --silent -H \"Content-Type: application/xml\" -X POST -u ${nexusLogin} -d \'${createGroupPayload}\' ${this.mvnRepoBaseURL}/service/local/repo_groups"
 			sh "${createGroupCommand}"
 
 			echo "Create the scheduled task to keep ${this.mvnRepoName}-releases from growing too big";
@@ -172,25 +178,21 @@ class NexusClient implements Serializable
 </scheduled-task>"""
 
 			// # nexus ignored application/json
-			final String createScheduleCommand =  "curl --silent -H \"Content-Type: application/xml\" -X POST -u ${NEXUS_LOGIN} -d \'${createSchedulePayload}\' ${this.mvnRepoBaseURL}/service/local/schedules"
+			final String createScheduleCommand =  "curl --silent -H \"Content-Type: application/xml\" -X POST -u ${nexusLogin} -d \'${createSchedulePayload}\' ${this.mvnRepoBaseURL}/service/local/schedules"
 			sh "${createScheduleCommand}"
-		} // withCredentials
 	}
 
 	def deleteRepo()
 	{
-		withCredentials([usernameColonPassword(credentialsId: 'nexus_jenkins', variable: 'NEXUS_LOGIN')])
-		{
 			echo "Delete the repository ${this.mvnRepoName}";
 
-			final String deleteGroupCommand = "curl --silent -X DELETE -u ${NEXUS_LOGIN} ${this.mvnRepoBaseURL}/service/local/repo_groups/${this.mvnRepoName}"
+			final String deleteGroupCommand = "curl --silent -X DELETE -u ${nexusLogin} ${this.mvnRepoBaseURL}/service/local/repo_groups/${this.mvnRepoName}"
 			sh "${deleteGroupCommand}"
 
-			final String deleteRepoCommand = "curl --silent -X DELETE -u ${NEXUS_LOGIN} ${this.mvnRepoBaseURL}/service/local/repositories/${this.mvnRepoName}-releases"
+			final String deleteRepoCommand = "curl --silent -X DELETE -u ${nexusLogin} ${this.mvnRepoBaseURL}/service/local/repositories/${this.mvnRepoName}-releases"
 			sh "${deleteRepoCommand}"
 
-			final String deleteScheduleCommand = "curl --silent -X DELETE -u ${NEXUS_LOGIN} ${this.mvnRepoBaseURL}/service/local/schedules/cleanup-repo-${this.mvnRepoName}-releases"
+			final String deleteScheduleCommand = "curl --silent -X DELETE -u ${nexusLogin} ${this.mvnRepoBaseURL}/service/local/schedules/cleanup-repo-${this.mvnRepoName}-releases"
 			sh "${deleteScheduleCommand}"
-		}
 	}
 }
