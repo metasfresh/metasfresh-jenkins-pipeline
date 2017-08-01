@@ -13,13 +13,13 @@ import de.metas.jenkins.MvnConf;
 def call(final MvnConf mvnConf, final String newParentVersion='LATEST')
 {
     echo """mvnUpdateParentPomVersion is called with
-\tmvnConf=${mvnConf}
-\tnewParentVersion=${newParentVersion}
+  mvnConf=${mvnConf}
+  newParentVersion=${newParentVersion}
 """
 
     if(newParentVersion && newParentVersion!='LATEST')
     {
-       echo "Update the parent pom version to the expolicitly given value ${newParentVersion}"
+       echo "Update the parent pom version to the explicitly given value ${newParentVersion}"
        sh "mvn --settings ${mvnConf.settingsFile} --file ${mvnConf.pomFile} --batch-mode -DallowSnapshots=false -DgenerateBackupPoms=true ${mvnConf.resolveParams} -DparentVersion=[${newParentVersion}] versions:update-parent";
     }
     else
