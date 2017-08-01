@@ -18,13 +18,15 @@ def call(final MvnConf mvnConf, final String newParentVersion='LATEST')
     {
        // update the parent pom version. Since https://github.com/metasfresh/metasfresh/issues/2102 we have a parent version *range*, therefore, we don't use "update-parent" anymore, but "resolve-ranges"
        echo "mvnUpdateParentPomVersion: Update the parent pom version to the explicitly given value ${newParentVersion}"
-       sh "mvn --settings ${mvnConf.settingsFile} --file ${mvnConf.pomFile} --batch-mode -DallowSnapshots=false -DgenerateBackupPoms=true ${mvnConf.resolveParams} -DparentVersion=[${newParentVersion}] versions:update-parent";
+       sh "mvn --settings ${mvnConf.settingsFile} --file ${mvnConf.pomFile} --non-recursive --batch-mode -DallowSnapshots=false -DgenerateBackupPoms=true ${mvnConf.resolveParams} -DparentVersion=[${newParentVersion}] versions:update-parent"
     }
     else
     {
        echo "mvnUpdateParentPomVersion: Resolve the parent version range"
 
        // this method is *just* about the parent pom. don't do unexpected additional stuff
-       final String processOnlyParentParams='-DprocessParent=true -DprocessDependencies=false -DprocessDependencyManagement=false -DprocessProperties=false';
-       sh "mvn --settings ${mvnConf.settingsFile} --file ${mvnConf.pomFile} --batch-mode -DallowSnapshots=false -DgenerateBackupPoms=true ${mvnConf.resolveParams} ${processOnlyParentParams} versions:resolve-ranges";    }
+       final String processOnlyParentParams='-DprocessParent=true -DprocessDependencies=false -DprocessDependencyManagement=false -DprocessProperties=false'
+
+       sh "mvn --settings ${mvnConf.settingsFile} --file ${mvnConf.pomFile} --non-recursive --batch-mode -DallowSnapshots=false -DgenerateBackupPoms=true ${mvnConf.resolveParams} ${processOnlyParentParams} versions:resolve-ranges"
+     }
 }
