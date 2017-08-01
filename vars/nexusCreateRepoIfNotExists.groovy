@@ -104,7 +104,7 @@ void createRepo(final String mvnRepoBaseURL, String mvnRepoName)
         <resourceURI>${mvnRepoBaseURL}/content/repositories/mvn-public/</resourceURI>
 			</repo-group-member>
 
-			<!-- include ${repoId}-releases which is the repo to which we release everything we build within this branch -->
+			<!-- include ${mvnRepoName}-releases which is the repo to which we release everything we build within this branch -->
       <repo-group-member>
         <name>${mvnRepoName}-releases</name>
         <id>${mvnRepoName}-releases</id>
