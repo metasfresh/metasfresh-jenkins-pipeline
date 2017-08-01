@@ -31,17 +31,17 @@ void createRepo(final String mvnRepoBaseURL, String mvnRepoName)
 		final String createHostedRepoPayload = """<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <repository>
   <data>
-	<id>${mvnRepoName}-releases</id>
-	<name>${mvnRepoName}-releases</name>
-	<exposed>true</exposed>
-	<repoType>hosted</repoType>
-	<writePolicy>ALLOW_WRITE_ONCE</writePolicy>
-    <browseable>true</browseable>
-    <indexable>true</indexable>
-	<repoPolicy>RELEASE</repoPolicy>
-	<providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
-	<provider>maven2</provider>
-	<format>maven2</format>
+		<id>${mvnRepoName}-releases</id>
+		<name>${mvnRepoName}-releases</name>
+		<exposed>true</exposed>
+		<repoType>hosted</repoType>
+		<writePolicy>ALLOW_WRITE_ONCE</writePolicy>
+	    <browseable>true</browseable>
+	    <indexable>true</indexable>
+		<repoPolicy>RELEASE</repoPolicy>
+		<providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+		<provider>maven2</provider>
+		<format>maven2</format>
   </data>
 </repository>
 """;
@@ -53,7 +53,6 @@ void createRepo(final String mvnRepoBaseURL, String mvnRepoName)
 		final String PUBLIC_REPO_BASE_URL="https://repo.metasfresh.com";
 
 		final boolean createProxyRepo = mvnRepoBaseURL != PUBLIC_REPO_BASE_URL;
-		final String proxyRepoGroupSnippet; // used further down
 		if(createProxyRepo)
 		{
 			// we need it to have all the task/branch specific artifacts that were build on the public jenkins
@@ -84,18 +83,10 @@ void createRepo(final String mvnRepoBaseURL, String mvnRepoName)
 			// # nexus ignored application/json
 			final String createProxyRepoCommand =  "curl --silent -H \"Content-Type: application/xml\" -X POST -u ${NEXUS_LOGIN} -d \'${createProxyRepoPayload}\' ${mvnRepoBaseURL}/service/local/repositories"
 			sh "${createProxyRepoCommand}"
-
-			proxyRepoGroupSnippet = """
-      <repo-group-member>
-      	<name>${mvnRepoName}-proxy</name>
-				<id>${mvnRepoName}-proxy</id>
-			  <resourceURI>${PUBLIC_REPO_BASE_URL}/content/repositories/${mvnRepoName}/</resourceURI>
-      </repo-group-member>"""
 		}
 		else
 		{
 			echo "SKIP creating a ${mvnRepoName}-proxy, because mvnRepoBaseURL=${PUBLIC_REPO_BASE_URL}"
-			proxyRepoGroupSnippet = ""
 		}
 
 		// create a repo group that contains both the local/hosted repo and the remote/proxy repo
@@ -105,26 +96,21 @@ void createRepo(final String mvnRepoBaseURL, String mvnRepoName)
 <repo-group>
   <data>
     <repositories>
+
+      <!-- include mvn-public that contains everything we need to perform the build -->
+      <repo-group-member>
+        <name>mvn-public</name>
+        <id>mvn-public</id>
+        <resourceURI>${mvnRepoBaseURL}/content/repositories/mvn-public/</resourceURI>
+			</repo-group-member>
+
+			<!-- include ${repoId}-releases which is the repo to which we release everything we build within this branch -->
       <repo-group-member>
         <name>${mvnRepoName}-releases</name>
         <id>${mvnRepoName}-releases</id>
         <resourceURI>${mvnRepoBaseURL}/content/repositories/${mvnRepoName}-releases/</resourceURI>
       </repo-group-member>
-${proxyRepoGroupSnippet}
-	  	<repo-group-member>
-        <name>mvn-3rdparty-private</name>
-        <id>mvn-3rdparty-private</id>
-        <resourceURI>${mvnRepoBaseURL}/content/repositories/mvn-3rdparty-private/</resourceURI>
-      </repo-group-member>
-      <!--
-          We need the following repo in the group to cover the case of a task branch that exists only in this repo and not in any upstream repo.
-          In that scenario, the "task"-proxy-repo will not work and be "blocked" by nexus, but everything required by the build will be available here.
-      -->
-	    <repo-group-member>
-        <name>mvn-master-proxy</name>
-        <id>mvn-master-proxy</id>
-        <resourceURI>${mvnRepoBaseURL}/content/repositories/mvn-master/</resourceURI>
-      </repo-group-member>
+
     </repositories>
     <name>${mvnRepoName}</name>
     <repoType>group</repoType>
@@ -142,8 +128,7 @@ ${proxyRepoGroupSnippet}
 		sh "${createGroupCommand}"
 
 		echo "Create the scheduled task to keep ${mvnRepoName}-releases from growing too big";
-
-	final String createSchedulePayload = """<?xml version="1.0" encoding="UTF-8"?>
+		final String createSchedulePayload = """<?xml version="1.0" encoding="UTF-8"?>
 <scheduled-task>
   <data>
 	<id>cleanup-repo-${mvnRepoName}-releases</id>
