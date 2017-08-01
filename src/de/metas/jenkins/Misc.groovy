@@ -36,7 +36,7 @@ String getCommitSha1()
  * @param wait if {@code true}, then this invokcation will wait for the invkoked job to finish and will fail if the invoked job fails.
  * @param jobFolderName the jenkins job folder name which also happens to be the github repository name of the project that we want to invoke here. Is used as prefix for the name of the job to be called.
  */
-def invokeDownStreamJobs(
+Map invokeDownStreamJobs(
 		final String buildId,
 		final String upstreamBranch,
 		final String parentPomVersion,
@@ -47,9 +47,9 @@ def invokeDownStreamJobs(
 {
 	echo "Invoking downstream job from folder=${jobFolderName} with preferred branch=${upstreamBranch}"
 
-  final String jobName = getEffectiveDownStreamJobName(jobFolderName, upstreamBranch);
+	final String jobName = getEffectiveDownStreamJobName(jobFolderName, upstreamBranch);
 
-	build job: jobName,
+	final buildResult = build job: jobName,
 		parameters: [
 			string(name: 'MF_PARENT_VERSION', value: parentPomVersion),
 			string(name: 'MF_UPSTREAM_BRANCH', value: upstreamBranch),
@@ -57,10 +57,13 @@ def invokeDownStreamJobs(
 			booleanParam(name: 'MF_TRIGGER_DOWNSTREAM_BUILDS', value: triggerDownStreamBuilds), // the job shall just run but not trigger further builds because we are doing all the orchestration
 			booleanParam(name: 'MF_SKIP_TO_DIST', value: skipToDist) // this param is only recognised by metasfresh
 		], wait: wait
+
+	echo "Job invokation done; buildResult.getBuildVariables()=${buildResult.getBuildVariables()}"
+	return buildResult.getBuildVariables();
 }
 
 
-def String getEffectiveDownStreamJobName(final String jobFolderName, final String upstreamBranch)
+String getEffectiveDownStreamJobName(final String jobFolderName, final String upstreamBranch)
 {
 	// if this is not the master branch but a feature branch, we need to find out if the "BRANCH_NAME" job exists or not
 	//
