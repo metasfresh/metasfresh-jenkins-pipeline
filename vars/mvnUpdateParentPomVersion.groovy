@@ -7,6 +7,9 @@ import de.metas.jenkins.MvnConf;
 // * https://github.com/fabric8io/fabric8-pipeline-library/blob/master/vars/gitTag.groovy
 // * https://jenkins.io/doc/book/pipeline/shared-libraries/
 
+/**
+  * Makes sure that the parent pom declared within the given {@code mvnConf}'s {@code pomFile} points to the given {@code newParentVersion}
+  */
 def call(final MvnConf mvnConf, final String newParentVersion='LATEST')
 {
     echo """mvnUpdateParentPomVersion is called with
