@@ -1,7 +1,5 @@
 package.de.metas.jenkins
 
-final String PUBLIC_REPO_BASE_URL="https://repo.metasfresh.com/content/repositories/";
-
 def call(final String mvnRepoBaseURL, String mvnRepoName)
 {
 	withCredentials([usernameColonPassword(credentialsId: 'nexus_jenkins', variable: 'NEXUS_LOGIN')])
@@ -52,7 +50,11 @@ void createRepo(final String mvnRepoBaseURL, String mvnRepoName)
 		final String createHostedRepoCommand =  "curl --silent -H \"Content-Type: application/xml\" -X POST -u ${NEXUS_LOGIN} -d \'${createHostedRepoPayload}\' ${mvnRepoBaseURL}/service/local/repositories"
 		sh "${createHostedRepoCommand}"
 
-		if(mvnRepoBaseURL != PUBLIC_REPO_BASE_URL)
+		final String PUBLIC_REPO_BASE_URL="https://repo.metasfresh.com";
+
+		final boolean createProxyRepo = mvnRepoBaseURL != PUBLIC_REPO_BASE_URL;
+		final String proxyRepoGroupSnippet; // used further down
+		if(createProxyRepo)
 		{
 			// we need it to have all the task/branch specific artifacts that were build on the public jenkins
 			echo "Create the repository ${mvnRepoName}-proxy";
@@ -73,7 +75,7 @@ void createRepo(final String mvnRepoBaseURL, String mvnRepoName)
 	<provider>maven2</provider>
 	<format>maven2</format>
 	<remoteStorage>
-      <remoteStorageUrl>https://repo.metasfresh.com/content/repositories/${mvnRepoName}/</remoteStorageUrl>
+      <remoteStorageUrl>${PUBLIC_REPO_BASE_URL}/content/repositories/${mvnRepoName}/</remoteStorageUrl>
     </remoteStorage>
   </data>
 </repository>
@@ -82,10 +84,18 @@ void createRepo(final String mvnRepoBaseURL, String mvnRepoName)
 			// # nexus ignored application/json
 			final String createProxyRepoCommand =  "curl --silent -H \"Content-Type: application/xml\" -X POST -u ${NEXUS_LOGIN} -d \'${createProxyRepoPayload}\' ${mvnRepoBaseURL}/service/local/repositories"
 			sh "${createProxyRepoCommand}"
+
+			proxyRepoGroupSnippet = """
+      <repo-group-member>
+      	<name>${mvnRepoName}-proxy</name>
+				<id>${mvnRepoName}-proxy</id>
+			  <resourceURI>${PUBLIC_REPO_BASE_URL}/content/repositories/${mvnRepoName}/</resourceURI>
+      </repo-group-member>"""
 		}
 		else
 		{
 			echo "SKIP creating a ${mvnRepoName}-proxy, because mvnRepoBaseURL=${PUBLIC_REPO_BASE_URL}"
+			proxyRepoGroupSnippet = ""
 		}
 
 		// create a repo group that contains both the local/hosted repo and the remote/proxy repo
@@ -100,12 +110,8 @@ void createRepo(final String mvnRepoBaseURL, String mvnRepoName)
         <id>${mvnRepoName}-releases</id>
         <resourceURI>${mvnRepoBaseURL}/content/repositories/${mvnRepoName}-releases/</resourceURI>
       </repo-group-member>
-      <repo-group-member>
-        <name>${mvnRepoName}-proxy</name>
-        <id>${mvnRepoName}-proxy</id>
-        <resourceURI>https://repo.metasfresh.com/content/repositories/${mvnRepoName}/</resourceURI>
-      </repo-group-member>
-	  <repo-group-member>
+${proxyRepoGroupSnippet}
+	  	<repo-group-member>
         <name>mvn-3rdparty-private</name>
         <id>mvn-3rdparty-private</id>
         <resourceURI>${mvnRepoBaseURL}/content/repositories/mvn-3rdparty-private/</resourceURI>
@@ -117,7 +123,7 @@ void createRepo(final String mvnRepoBaseURL, String mvnRepoName)
 	    <repo-group-member>
         <name>mvn-master-proxy</name>
         <id>mvn-master-proxy</id>
-        <resourceURI>https://repo.metasfresh.com/content/repositories/mvn-master/</resourceURI>
+        <resourceURI>${mvnRepoBaseURL}/content/repositories/mvn-master/</resourceURI>
       </repo-group-member>
     </repositories>
     <name>${mvnRepoName}</name>

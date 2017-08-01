@@ -47,7 +47,7 @@ class MvnConf implements Serializable
 		*/
 	String getResolveParams()
 	{
-		String mvnResolveRepoURL = "${this.mvnRepoBaseURL}/${this.mvnRepoName}"
+		String mvnResolveRepoURL = "${this.mvnRepoBaseURL}/content/repositories/${this.mvnRepoName}"
 		return "-Dtask-repo-id=${MF_MAVEN_REPO_ID} -Dtask-repo-name=\"${this.mvnRepoName}\" -Dtask-repo-url=\"${mvnResolveRepoURL}\"";
 	}
 
@@ -56,7 +56,7 @@ class MvnConf implements Serializable
 		*/
 	String getDeployParam()
 	{
-		String mvnDeployRepoURL = "${this.mvnRepoBaseURL}/${this.mvnRepoName}-releases"
+		String mvnDeployRepoURL = "${this.mvnRepoBaseURL}/content/repositories/${this.mvnRepoName}-releases"
 		return "-DaltDeploymentRepository=\"${MF_MAVEN_REPO_ID}::default::${mvnDeployRepoURL}\"";
 	}
 }
