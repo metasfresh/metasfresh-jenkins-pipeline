@@ -23,6 +23,8 @@ def call(final MvnConf mvnConf, final String newParentVersion='LATEST')
     else
     {
        echo "mvnUpdateParentPomVersion: Resolve the parent version range"
-       sh "mvn --settings ${mvnConf.settingsFile} --file ${mvnConf.pomFile} --batch-mode -DallowSnapshots=false -DgenerateBackupPoms=true ${mvnConf.resolveParams} -DprocessParent=true versions:resolve-ranges";
-    }
+
+       // this method is *just* about the parent pom. don't do unexpected additional stuff
+       final String processOnlyParentParams='-DprocessParent=true -DprocessDependencies=false -DprocessDependencyManagement=false -DprocessProperties=false';
+       sh "mvn --settings ${mvnConf.settingsFile} --file ${mvnConf.pomFile} --batch-mode -DallowSnapshots=false -DgenerateBackupPoms=true ${mvnConf.resolveParams} ${processOnlyParentParams} versions:resolve-ranges";    }
 }
