@@ -4,8 +4,8 @@ class Nexus implements Serializable
 {
 	final String PUBLIC_REPO_BASE_URL="https://repo.metasfresh.com/content/repositories/";
 
-	final String mvnRepoBaseURL
-	final String mvnRepoName
+	final String mvnRepoBaseURL;
+	final String mvnRepoName;
 
 	Nexus(
 			String mvnRepoBaseURL,

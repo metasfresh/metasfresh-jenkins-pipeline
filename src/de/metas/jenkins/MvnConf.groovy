@@ -1,4 +1,4 @@
-package de.metas.jenkins;
+package de.metas.jenkins
 
 class MvnConf implements Serializable
 {
