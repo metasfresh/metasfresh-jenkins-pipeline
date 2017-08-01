@@ -4,18 +4,22 @@ package de.metas.jenkins;
  * This method calls additional downstream jobs such as metasfresh-procurement and metasfresh-webui from metasfresh.
  * Please don't invoke it from within a node block, because it also contains a node block which might need to the pipeline beeing blocked unneccesarily.
  *
- * @param jobFolderName the jenkins job folder name which also happens to be the github repository name of the project that we want to invoke here. Is used as prefix for the name of the job to be called.
  * @param buildId is used as value for the {@code MF_UPSTREAM_BUILDNO} job parameter
  * @param upstreamBranch the preferred branch. If there is a jenkins job for that branch, it will be invoked. Otherwise the {@code master} branch's job will be invoked.
  * @param parentPomVersion is used as value for the {@code MF_PARENT_VERSION} job parameter
- * @param wait if {@code true}, then this invokcation will wait for the invkoked job to finish and will fail if the invoked job fails-
+ * @param skipToDist is used as value for the {@code MF_SKIP_TO_DIST} job parameter (only evalated by the metasfresh jobs!)
+ * @param triggerDownStreamBuilds is used as value for the {@code MF_TRIGGER_DOWNSTREAM_BUILDS} job parameter
+ * @param wait if {@code true}, then this invokcation will wait for the invkoked job to finish and will fail if the invoked job fails.
+ * @param jobFolderName the jenkins job folder name which also happens to be the github repository name of the project that we want to invoke here. Is used as prefix for the name of the job to be called.
  */
 def invokeDownStreamJobs(
-		final String jobFolderName,
 		final String buildId,
 		final String upstreamBranch,
 		final String parentPomVersion,
-		final boolean wait)
+		final boolean skipToDist,
+		final boolean triggerDownStreamBuilds,
+		final boolean wait,
+		final String jobFolderName)
 {
 	echo "Invoking downstream job from folder=${jobFolderName} with preferred branch=${upstreamBranch}"
 
@@ -61,7 +65,7 @@ def invokeDownStreamJobs(
 			string(name: 'MF_PARENT_VERSION', value: parentPomVersion),
 			string(name: 'MF_UPSTREAM_BRANCH', value: upstreamBranch),
 			string(name: 'MF_UPSTREAM_BUILDNO', value: buildId),
-			booleanParam(name: 'MF_TRIGGER_DOWNSTREAM_BUILDS', value: false), // the job shall just run but not trigger further builds because we are doing all the orchestration
-			booleanParam(name: 'MF_SKIP_TO_DIST', value: true) // this param is only recognised by metasfresh
+			booleanParam(name: 'MF_TRIGGER_DOWNSTREAM_BUILDS', value: triggerDownStreamBuilds), // the job shall just run but not trigger further builds because we are doing all the orchestration
+			booleanParam(name: 'MF_SKIP_TO_DIST', value: skipToDist) // this param is only recognised by metasfresh
 		], wait: wait
 }
