@@ -6,22 +6,21 @@
 // * https://jenkins.io/doc/book/pipeline/shared-libraries/
 
 
-def call(final script, final String pomFile='pom.xml', final String newParentVersion='LATEST')
+def call(final MvnConf mvnConf, final String newParentVersion='LATEST')
 {
     echo """mvnUpdateParentPomVersion is called with
-\tscript=${script}
-\tpomFile=${pomFile}
+\tmavenConf=${mavenConf}
 \tnewParentVersion=${newParentVersion}
 """;
 
-    if(config.newParentVersion && .config.newParentVersion!='LATEST')
+    if(newParentVersion && newParentVersion!='LATEST')
     {
        echo "Update the parent pom version to the expolicitly given value ${newParentVersion}"
-       sh "mvn --settings ${script.MAVEN_SETTINGS} --file ${pomFile} --batch-mode -DallowSnapshots=false -DgenerateBackupPoms=true ${script.MF_MAVEN_TASK_RESOLVE_PARAMS} -DparentVersion=[${newParentVersion}] versions:update-parent";
+       sh "mvn --settings ${mvnConf.settingsFile} --file ${mvnConf.pomFile} --batch-mode -DallowSnapshots=false -DgenerateBackupPoms=true ${mvnConf.resolveParams} -DparentVersion=[${newParentVersion}] versions:update-parent";
     }
     else
     {
        echo "Resolve the parent version range"
-       sh "mvn --settings ${script.MAVEN_SETTINGS} --file ${pomFile} --batch-mode -DallowSnapshots=false -DgenerateBackupPoms=true ${script.MF_MAVEN_TASK_RESOLVE_PARAMS} -DprocessParent=true versions:resolve-ranges";
+       sh "mvn --settings ${mvnConf.settingsFile} --file ${mvnConf.pomFile} --batch-mode -DallowSnapshots=false -DgenerateBackupPoms=true ${mvnConf.resolveParams} -DprocessParent=true versions:resolve-ranges";
     }
 }
