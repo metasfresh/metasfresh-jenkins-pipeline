@@ -1,6 +1,6 @@
 package de.metas.jenkins;
 
-class MvnConf
+class MvnConf implements Serializable
 {
 	/**
 	  * String containing the pom file, to be concatenated to a "--file .." parameter
