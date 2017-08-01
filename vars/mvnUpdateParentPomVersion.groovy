@@ -16,7 +16,7 @@ import de.metas.jenkins.MvnConf;
   */
 def call(final MvnConf mvnConf)
 {
-    echo "mvnUpdateParentPomVersion is called with newParentVersion=${newParentVersion} and mvnConf=${mvnConf}"
+    echo "mvnUpdateParentPomVersion is called with mvnConf=${mvnConf}"
 
     // make sure we know which plugin version we run
     final String pluginGAV='org.codehaus.mojo:versions-maven-plugin:2.4'
