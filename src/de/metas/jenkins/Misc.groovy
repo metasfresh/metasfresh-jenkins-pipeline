@@ -1,4 +1,4 @@
-package.de.metas.jenkins
+package de.metas.jenkins;
 
 
 /**
@@ -65,26 +65,4 @@ def invokeDownStreamJobs(
 			booleanParam(name: 'MF_TRIGGER_DOWNSTREAM_BUILDS', value: false), // the job shall just run but not trigger further builds because we are doing all the orchestration
 			booleanParam(name: 'MF_SKIP_TO_DIST', value: true) // this param is only recognised by metasfresh
 		], wait: wait
-}
-
-/**
- *
- * @param newParentVersion can be null/empty, {@code LATEST} or a specific version
- */
-def updateParentPomVersion(final String pomFile, final String newParentVersion)
-{
- echo """updateParentPomVersion is called with paramters:
-\t pomFile=${pomFile}
-\t newParentVersion=${newParentVersion}
- """
- if(newParentVersion && newParentVersion!='LATEST')
- {
-   echo "Update the parent pom version to the expolicitly given value ${newParentVersion}"
-   sh "mvn --settings $MAVEN_SETTINGS --file ${pomFile} --batch-mode -DallowSnapshots=false -DgenerateBackupPoms=true ${MF_MAVEN_TASK_RESOLVE_PARAMS} -DparentVersion=[${newParentVersion}] versions:update-parent";
- }
- else
- {
-   echo "Resolve the parent version range"
-   sh "mvn --settings $MAVEN_SETTINGS --file ${pomFile} --batch-mode -DallowSnapshots=false -DgenerateBackupPoms=true ${MF_MAVEN_TASK_RESOLVE_PARAMS} -DprocessParent=true versions:resolve-ranges";
- }
 }
