@@ -42,13 +42,17 @@ class MvnConf implements Serializable
 ]""";
 	}
 
+	String getRepoURL()
+	{
+		return "${this.mvnRepoBaseURL}/content/repositories/${this.mvnRepoName}"
+	}
+
 	/**
 	  * @return a string containing a number of "-Dtask-repo-.." maven parameters, used to resolve dependencies from the repos that we want to resolve from
 		*/
 	String getResolveParams()
 	{
-		String mvnResolveRepoURL = "${this.mvnRepoBaseURL}/content/repositories/${this.mvnRepoName}"
-		return "-Dtask-repo-id=${MF_MAVEN_REPO_ID} -Dtask-repo-name=\"${this.mvnRepoName}\" -Dtask-repo-url=\"${mvnResolveRepoURL}\"";
+		return "-Dtask-repo-id=${MF_MAVEN_REPO_ID} -Dtask-repo-name=\"${this.mvnRepoName}\" -Dtask-repo-url=\"${getRepoURL()}\"";
 	}
 
 	/**
