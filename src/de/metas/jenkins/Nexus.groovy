@@ -1,13 +1,13 @@
 package.de.metas.jenkins
 
-class Nexus implements Serializable
+class NexusClient implements Serializable
 {
 	final String PUBLIC_REPO_BASE_URL="https://repo.metasfresh.com/content/repositories/";
 
 	final String mvnRepoBaseURL;
 	final String mvnRepoName;
 
-	Nexus(
+	NexusClient(
 			String mvnRepoBaseURL,
 			String mvnRepoName
 			)
