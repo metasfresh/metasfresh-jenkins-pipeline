@@ -30,7 +30,6 @@ class MvnConf implements Serializable
 		this.settingsFile = settingsFile
 		this.mvnRepoBaseURL = mvnRepoBaseURL
 		this.mvnRepoName = mvnRepoName
-
 	}
 
 	String toString()
