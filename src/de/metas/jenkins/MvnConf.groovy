@@ -19,6 +19,14 @@ class MvnConf implements Serializable
 
 	final String mvnRepoBaseURL;
 
+	/**
+	  * Creates a new instance.
+		*
+		* @param pomFile example 1: 'pom.xml'; example 2: 'de.metas.reactor/pom.xml'
+		* @param settingsFile the settings.xml file
+		* @param mvnRepoBaseURL exmaple 'https://repo.metasfresh.com'
+		* @param mvnRepoName example 'gh2102-mf'
+		*/
 	MvnConf(
 			String pomFile,
 			String settingsFile,
@@ -35,10 +43,10 @@ class MvnConf implements Serializable
 	String toString()
 	{
 		return """MvnConf[
-\tpomFile=${pomFile},
-\tsettingsFile=${settingsFile},
-\tresolveParams=${resolveParams},
-\tdeployParam=${deployParam}
+  pomFile=${pomFile},
+  settingsFile=${settingsFile},
+  resolveParams=${resolveParams},
+  deployParam=${deployParam}
 ]""";
 	}
 
