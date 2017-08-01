@@ -1,6 +1,17 @@
 package de.metas.jenkins;
 
 /**
+ * According to the documentation at https://docs.docker.com/engine/reference/commandline/tag/ :
+ * A tag name must be valid ASCII and may contain lowercase and uppercase letters, digits, underscores, periods and dashes. A tag name may not start with a period or a dash and may contain a maximum of 128 characters.
+ */
+String mkDockerTag(String input)
+{
+ 	return input
+ 		.replaceFirst('^[#\\.]', '') // delete the first letter if it is a period or dash
+ 		.replaceAll('[^a-zA-Z0-9_#\\.]', '_'); // replace everything that's not allowed with an underscore
+}
+
+/**
  * This method calls additional downstream jobs such as metasfresh-procurement and metasfresh-webui from metasfresh.
  * Please don't invoke it from within a node block, because it also contains a node block which might need to the pipeline beeing blocked unneccesarily.
  *
