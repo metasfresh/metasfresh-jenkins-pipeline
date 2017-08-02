@@ -2,42 +2,63 @@ package de.metas.jenkins
 
 class MvnConf implements Serializable
 {
-	final MF_MAVEN_REPO_ID = "metasfresh-task-repo";
+	final MF_MAVEN_REPO_ID = "metasfresh-task-repo"
 
 
 	/**
 	  * String containing the pom file, to be concatenated to a "--file .." parameter
 	  */
-	final String pomFile;
+	final String pomFile
 
 	/**
 	  * String containing the settings file, to be contatenated to a "--settings .." parameter
 		*/
-	final String settingsFile;
+	final String settingsFile
 
-	final String mvnRepoName;
+	final String mvnRepoName
 
-	final String mvnRepoBaseURL;
+	final String mvnResolveRepoBaseURL
+
+	final String mvnDeployRepoBaseURL
 
 	/**
 	  * Creates a new instance.
 		*
 		* @param pomFile example 1: 'pom.xml'; example 2: 'de.metas.reactor/pom.xml'
 		* @param settingsFile the settings.xml file
-		* @param mvnRepoBaseURL exmaple 'https://repo.metasfresh.com'
 		* @param mvnRepoName example 'gh2102-mf'
+		* @param mvnResolveRepoBaseURL; used for both the resolve and deployment related URLs exmaple 'https://repo.metasfresh.com'
 		*/
 	MvnConf(
 			String pomFile,
 			String settingsFile,
-			String mvnRepoBaseURL,
-			String mvnRepoName
+			String mvnRepoName,
+			String mvnRepoBaseURL
 			)
 	{
 		this.pomFile = pomFile
 		this.settingsFile = settingsFile
-		this.mvnRepoBaseURL = mvnRepoBaseURL
 		this.mvnRepoName = mvnRepoName
+		this.mvnResolveRepoBaseURL = mvnRepoBaseURL
+		this.mvnDeployRepoBaseURL = mvnRepoBaseURL
+	}
+
+	/**
+	  * Similar to the other constructor, but allows deployment and resolve repos to differ
+	  */
+	MvnConf(
+			String pomFile,
+			String settingsFile,
+			String mvnRepoName,
+			String mvnResolveRepoBaseURL,
+			String mvnDeployRepoBaseURL
+			)
+	{
+		this.pomFile = pomFile
+		this.settingsFile = settingsFile
+		this.mvnRepoName = mvnRepoName
+		this.mvnResolveRepoBaseURL = mvnResolveRepoBaseURL
+		this.mvnDeployRepoBaseURL = mvnDeployRepoBaseURL
 	}
 
 	String toString()
@@ -45,14 +66,19 @@ class MvnConf implements Serializable
 		return """MvnConf[
   pomFile=${pomFile},
   settingsFile=${settingsFile},
-  resolveParams=${resolveParams},
-  deployParam=${deployParam}
+  mvnResolveRepoBaseURL=${mvnResolveRepoBaseURL},
+  mvnRepoName=${mvnRepoName}
 ]""";
 	}
 
-	String getRepoURL()
+	String getDeployRepoURL()
 	{
-		return "${this.mvnRepoBaseURL}/content/repositories/${this.mvnRepoName}"
+		return "${this.mvnDeployRepoBaseURL}/content/repositories/${this.mvnRepoName}"
+	}
+
+	String getResolveRepoURL()
+	{
+		return "${this.mvnResolveRepoBaseURL}/content/repositories/${this.mvnRepoName}"
 	}
 
 	/**
@@ -61,7 +87,7 @@ class MvnConf implements Serializable
 		*/
 	String getResolveParams()
 	{
-		return "-Dtask-repo-id=${MF_MAVEN_REPO_ID} -Dtask-repo-name=\"${this.mvnRepoName}\" -Dtask-repo-url=\"${getRepoURL()}\"";
+		return "-Dtask-repo-id=${MF_MAVEN_REPO_ID} -Dtask-repo-name=\"${this.mvnRepoName}\" -Dtask-repo-url=\"${this.resolveRepoURL}\"";
 	}
 
 	/**
@@ -69,12 +95,12 @@ class MvnConf implements Serializable
 		*/
 	String getDeployParam()
 	{
-		String mvnDeployRepoURL = "${this.mvnRepoBaseURL}/content/repositories/${this.mvnRepoName}-releases"
+		String mvnDeployRepoURL = "${this.mvnResolveRepoBaseURL}/content/repositories/${this.mvnRepoName}-releases"
 		return "-DaltDeploymentRepository=\"${MF_MAVEN_REPO_ID}::default::${mvnDeployRepoURL}\"";
 	}
 
 	MvnConf withPomFile(String pomFile)
 	{
-		return new MvnConf(pomFile,	this.settingsFile, this.mvnRepoBaseURL,	this.mvnRepoName)
+		return new MvnConf(pomFile,	this.settingsFile, this.mvnResolveRepoBaseURL,	this.mvnRepoName)
 	}
 }
