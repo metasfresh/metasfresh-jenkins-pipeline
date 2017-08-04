@@ -117,4 +117,6 @@ String retrieveEffectiveBranchName(final String metasFreshRepoName, final String
   		echo "Branch ${branchName} does not exist in ${metasFreshRepoName}; falling back to master"
   		effectiveBranchName = 'master'
   	}
+
+    return effectiveBranchName;
 }
