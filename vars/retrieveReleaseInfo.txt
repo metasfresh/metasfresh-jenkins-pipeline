@@ -1,0 +1,6 @@
+Downloads and loads our release info properties for this build from [metasfresh/metasfresh-release-info](https://github.com/metasfresh/metasfresh-release-info).
+
+See issue "make version/build infos more transparent" [metasfresh/metasfresh#2110](https://github.com/metasfresh/metasfresh/issues/2110)
+Note that this step requires the [Pipeline Utility Steps](https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Utility+Steps+Plugin) plugin to be available.
+
+The system will get the infos from the given `branchName` or fall back to the `master` branch, if the metasfresh-release-info repository doesn't have the given branch.
