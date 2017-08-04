@@ -4,6 +4,7 @@ import de.metas.jenkins.Misc;
 
 Properties call(final String branchName)
 {
+    echo "retrieveReleaseInfo is called with branchName=${branchName}"
     final Misc misc = de.metas.jenkins.Misc();
     final String effectiveBranchName = misc.retrieveEffectiveBranchName('metasfresh-release-info', branchName);
 
