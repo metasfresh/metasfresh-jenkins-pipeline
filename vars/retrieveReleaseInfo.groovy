@@ -2,7 +2,7 @@
 
 import de.metas.jenkins.Misc
 
-Properties call(final String branchName)
+String call(final String branchName)
 {
     echo "retrieveReleaseInfo is called with branchName=${branchName}"
     final Misc misc = new de.metas.jenkins.Misc()
@@ -12,7 +12,7 @@ Properties call(final String branchName)
     sh "wget https://raw.githubusercontent.com/metasfresh/metasfresh-release-info/${effectiveBranchName}/release-info.properties"
 
     Properties props = readProperties  file: 'release-info.properties'
-    echo "Succeeded to load the following props: ${props}"
+    echo "Succeeded to load the following props: ${props}; return only release.version for now as noone uses the other(s)."
 
-    return props
+    return props.release.version
 }
