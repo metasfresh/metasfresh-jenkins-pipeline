@@ -109,12 +109,12 @@ String retrieveEffectiveBranchName(final String metasFreshRepoName, final String
     final String effectiveBranchName;
   	if(exitCode == 0)
   	{
-  		echo "Branch ${upstreamBranch} also exists in ${metasFreshRepoName}"
+  		echo "Branch ${branchName} also exists in ${metasFreshRepoName}"
   		effectiveBranchName = branchName
   	}
   	else
   	{
-  		echo "Branch ${upstreamBranch} does not exist in ${metasFreshRepoName}; falling back to master"
+  		echo "Branch ${branchName} does not exist in ${metasFreshRepoName}; falling back to master"
   		effectiveBranchName = 'master'
   	}
 }
