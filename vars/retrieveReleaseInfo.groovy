@@ -12,7 +12,7 @@ String call(final String branchName)
     sh "wget https://raw.githubusercontent.com/metasfresh/metasfresh-release-info/${effectiveBranchName}/release-info.properties"
 
     Properties props = readProperties  file: 'release-info.properties'
-    echo "Succeeded to load the following props: ${props}; return only release.version for now as noone uses the other(s)."
+    echo "Succeeded to load the following props: ${props}; return only release.version=${props[release.version]} for now as noone uses the other(s)."
 
-    return props.release.version
+    return props[release.version]
 }
