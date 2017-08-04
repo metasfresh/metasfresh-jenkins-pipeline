@@ -9,10 +9,12 @@ String call(final String branchName)
     final String effectiveBranchName = misc.retrieveEffectiveBranchName('metasfresh-release-info', branchName)
 
     echo "Attempting to retrive the latest release-info.properties for effectiveBranchName=${effectiveBranchName}"
-    sh "wget https://raw.githubusercontent.com/metasfresh/metasfresh-release-info/${effectiveBranchName}/release-info.properties"
+    // use -O so a possible stale file is overwritten
+    sh "wget https://raw.githubusercontent.com/metasfresh/metasfresh-release-info/${effectiveBranchName}/release-info.properties -O release-info.properties"
 
     Properties props = readProperties  file: 'release-info.properties'
-    echo "Succeeded to load the following props: ${props}; return only release.version=${props[release.version]} for now as noone uses the other(s)."
+    final String releaseVersion = props."release.version"
+    echo "Succeeded to load the following props: ${props}; return only release.version=${releaseVersion} for now as noone uses the other(s)."
 
-    return props[release.version]
+    return releaseVersion
 }
