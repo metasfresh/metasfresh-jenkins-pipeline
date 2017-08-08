@@ -66,8 +66,9 @@ class MvnConf implements Serializable
 		return """MvnConf[
   pomFile=${pomFile},
   settingsFile=${settingsFile},
-  mvnResolveRepoBaseURL=${mvnResolveRepoBaseURL},
   mvnRepoName=${mvnRepoName}
+	mvnResolveRepoBaseURL=${mvnResolveRepoBaseURL},
+	mvnDeployRepoBaseURL=${mvnDeployRepoBaseURL}
 ]""";
 	}
 
