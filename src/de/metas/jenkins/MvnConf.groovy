@@ -102,6 +102,6 @@ class MvnConf implements Serializable
 
 	MvnConf withPomFile(String pomFile)
 	{
-		return new MvnConf(pomFile,	this.settingsFile, this.mvnResolveRepoBaseURL,	this.mvnRepoName)
+		return new MvnConf(pomFile,	this.settingsFile, this.mvnRepoName, this.mvnResolveRepoBaseURL, this.mvnDeployRepoBaseURL)
 	}
 }
