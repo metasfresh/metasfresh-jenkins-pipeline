@@ -1,6 +1,6 @@
 Downloads and loads our release info properties for this build from [metasfresh/metasfresh-release-info](https://github.com/metasfresh/metasfresh-release-info).
 
-Runs within its own `node` block (label=`linux`)because it uses the `sh` step`!
+This step needs to be invoked within a `node` block (label=`linux`), because it uses the `sh` step`!
 
 See issue "make version/build infos more transparent" [metasfresh/metasfresh#2110](https://github.com/metasfresh/metasfresh/issues/2110)
 Note that this step requires the [Pipeline Utility Steps](https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Utility+Steps+Plugin) plugin to be available.

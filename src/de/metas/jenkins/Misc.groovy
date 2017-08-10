@@ -11,6 +11,9 @@ String mkDockerTag(String input)
  		.replaceAll('[^a-zA-Z0-9_#\\.]', '_'); // replace everything that's not allowed with an underscore
 }
 
+/**
+  * This method needs to be invoked within a `node` block (label=`linux`), because it uses the `sh` step`!
+  */
 String getCommitSha1()
 {
   // getting the commit_sha1 like this is a workaround until https://issues.jenkins-ci.org/browse/JENKINS-26100 is done
@@ -26,7 +29,7 @@ String getCommitSha1()
 
 /**
  * This method calls additional downstream jobs such as metasfresh-procurement and metasfresh-webui from metasfresh.
- * Please don't invoke it from within a node block, because it also contains a node block which might need to the pipeline beeing blocked unneccesarily.
+ * This method needs to be invoked within a `node` block (label=`linux`), because it uses the `sh` step`!
  *
  * @param buildId is used as value for the {@code MF_UPSTREAM_BUILDNO} job parameter
  * @param upstreamBranch the preferred branch. If there is a jenkins job for that branch, it will be invoked. Otherwise the {@code master} branch's job will be invoked.
@@ -62,7 +65,17 @@ Map invokeDownStreamJobs(
 	return buildResult.getBuildVariables();
 }
 
+String getEffectiveDownStreamJobNameInNodeBlock(final String jobFolderName, final String upstreamBranch)
+{
+  node('linux')
+  {
+    return getEffectiveDownStreamJobName(jobFolderName, upstreamBranch)
+  }
+}
 
+/**
+  * This method needs to be invoked within a `node` block (label=`linux`), because it uses the `sh` step`!
+  */
 String getEffectiveDownStreamJobName(final String jobFolderName, final String upstreamBranch)
 {
   	// if this is not the master branch but a feature branch, we need to find out if the "BRANCH_NAME" job exists or not
@@ -85,6 +98,8 @@ String getEffectiveDownStreamJobName(final String jobFolderName, final String up
 }
 
 /**
+  * This method needs to be invoked within a `node` block (label=`linux`), because it uses the `sh` step`!
+  *
   * @param metasFreshRepoName the repository name below https://github.com/metasfresh/
   * @param branchName the branch we are looking for. If the given repos does not have such a branch, {@code master} is returned instead
   *
@@ -96,15 +111,13 @@ String retrieveEffectiveBranchName(final String metasFreshRepoName, final String
   	//
   	// Here i'm not checking if the build job exists but if the respective branch on github exists. If the branch is there, then I assume that the multibranch plugin also created the job
   	def exitCode;
-  	node('linux')
-  	{
-  		// We run this within a node to avoid the error saying:
-  		// Required context class hudson.FilePath is missing
-  		// Perhaps you forgot to surround the code with a step that provides this, such as: node
-  		// ...
-  		// org.jenkinsci.plugins.workflow.steps.MissingContextVariableException: Required context class hudson.FilePath is missing
-  		exitCode = sh returnStatus: true, script: "git ls-remote --exit-code https://github.com/metasfresh/${metasFreshRepoName} ${branchName}"
-    }
+
+		// We run this within a node to avoid the error saying:
+		// Required context class hudson.FilePath is missing
+		// Perhaps you forgot to surround the code with a step that provides this, such as: node
+		// ...
+		// org.jenkinsci.plugins.workflow.steps.MissingContextVariableException: Required context class hudson.FilePath is missing
+		exitCode = sh returnStatus: true, script: "git ls-remote --exit-code https://github.com/metasfresh/${metasFreshRepoName} ${branchName}"
 
     final String effectiveBranchName;
   	if(exitCode == 0)
