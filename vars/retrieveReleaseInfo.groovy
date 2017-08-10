@@ -21,7 +21,6 @@ String retrieveReleaseInfo(final String branchName)
 
 String call(final String branchName)
 {
-  "NODE_LABELS=${env.NODE_LABELS}"
   if(env.NODE_LABELS)
   {
     final def labels = env.NODE_LABELS.tokenize(' ');
@@ -30,9 +29,11 @@ String call(final String branchName)
       error "Our current node ${env.NODE_NAME} lacks the \'linux\' label. Please make sure to explicitly run on a 'linux' node, no node at all, to leave it to this step"
     }
     // we are on a 'linux' node
+    echo "retrieveReleaseInfo is called on node ${env.NODE_NAME}"
     return retrieveReleaseInfo(branchName);
   }
-  // we are not winthing a node, so start one now
+  // we are not winthin a node, so start one now
+  echo 'retrieveReleaseInfo is not called on a node, so we now open our own node block'
   node('linux')
   {
     return retrieveReleaseInfo(branchName);
