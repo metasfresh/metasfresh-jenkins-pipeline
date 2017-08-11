@@ -1,0 +1,1 @@
+Invokes retrieveReleaseInfo with the given `branchName` and then constructs the version string to be used when making the current build.
