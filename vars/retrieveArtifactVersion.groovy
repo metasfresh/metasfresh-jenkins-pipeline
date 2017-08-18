@@ -10,7 +10,7 @@ String call(final String branchName, final String buildNo)
 	final patchVersion = branchName.equals('master') ? "1" : "2"
 	echo "Set PatchVersion=${patchVersion}"
 
-	final String artifactVersion="${majorAndMinorVersion}.${patchVersion}-${buildNo}+{branchName}"
+	final String artifactVersion="${majorAndMinorVersion}.${patchVersion}-${buildNo}+${branchName}"
 	echo "Set artifactVersion={artifactVersion}"
 
 	return artifactVersion
