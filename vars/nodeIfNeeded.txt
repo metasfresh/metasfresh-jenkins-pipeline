@@ -1,0 +1,1 @@
+Runs the given closure within a `node` block with the given **simple** label, unless we already are in such a node block

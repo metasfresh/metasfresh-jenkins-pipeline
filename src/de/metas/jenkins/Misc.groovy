@@ -112,12 +112,14 @@ String retrieveEffectiveBranchName(final String metasFreshRepoName, final String
   	// Here i'm not checking if the build job exists but if the respective branch on github exists. If the branch is there, then I assume that the multibranch plugin also created the job
   	def exitCode;
 
-		// We run this within a node to avoid the error saying:
-		// Required context class hudson.FilePath is missing
-		// Perhaps you forgot to surround the code with a step that provides this, such as: node
-		// ...
-		// org.jenkinsci.plugins.workflow.steps.MissingContextVariableException: Required context class hudson.FilePath is missing
-		exitCode = sh returnStatus: true, script: "git ls-remote --exit-code https://github.com/metasfresh/${metasFreshRepoName} ${branchName}"
+	// We run this within a node to avoid the error saying:
+	// Required context class hudson.FilePath is missing
+	// Perhaps you forgot to surround the code with a step that provides this, such as: node
+	// ...
+	// org.jenkinsci.plugins.workflow.steps.MissingContextVariableException: Required context class hudson.FilePath is missing
+    nodeIfNeeded('linux', {
+        exitCode = sh returnStatus: true, script: "git ls-remote --exit-code https://github.com/metasfresh/${metasFreshRepoName} ${branchName}"
+    })
 
     final String effectiveBranchName;
   	if(exitCode == 0)
