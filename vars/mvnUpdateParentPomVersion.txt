@@ -1,0 +1,7 @@
+
+Makes sure that the **parent pom** declared within the given {@code mvnConf}'s {@code pomFile} is resolved to a particular version.
+
+Note that we can't reliably resolve the range to *a particular* version.
+`resolve-ranges` has no parameter to specify a version and<br>
+`update-parent` happens do only to its job if the 'parentVersion' value is not the latest one.<br>
+Therefore (i.e. because it's pretty hard for us) and because `metasfresh-parent` is a slow-moving target, we don't insist on controlling it to particular version.

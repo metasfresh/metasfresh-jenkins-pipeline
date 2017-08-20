@@ -7,13 +7,6 @@ import de.metas.jenkins.MvnConf;
 // * https://github.com/fabric8io/fabric8-pipeline-library/blob/master/vars/gitTag.groovy
 // * https://jenkins.io/doc/book/pipeline/shared-libraries/
 
-/**
-  * Makes sure that the parent pom declared within the given {@code mvnConf}'s {@code pomFile} is resolved to a particular version.
-  * Note that we can't reliably resolve the range to *a particular* version.
-  * 'resolve-ranges' has no parameter to specify a version and
-  * 'update-parent' happens to only to its job if the 'parentVersion' values is *not the latest one*.
-  * Therefore and becauwse metasfresh-parent is a slow-moving target, we don't insist on controlling it to particular version.
-  */
 def call(final MvnConf mvnConf)
 {
     echo "mvnUpdateParentPomVersion is called with mvnConf=${mvnConf}"
