@@ -11,6 +11,11 @@ String mkDockerTag(String input)
  		.replaceAll('[^a-zA-Z0-9_#\\.]', '_'); // replace everything that's not allowed with an underscore
 }
 
+String mkReleaseDate()
+{
+  return new Date().format( 'MM-dd-yyyy' )
+}
+
 /**
   * This method needs to be invoked within a `node` block (label=`linux`), because it uses the `sh` step`!
   */
