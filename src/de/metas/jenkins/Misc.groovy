@@ -11,9 +11,22 @@ String mkDockerTag(String input)
  		.replaceAll('[^a-zA-Z0-9_#\\.]', '_'); // replace everything that's not allowed with an underscore
 }
 
+/**
+  * Just returns the current date, formatted as yyyy-dd-MM (e.g. "2017-08-22").
+  */
 String mkReleaseDate()
 {
-  return new Date().format( 'MM-dd-yyyy' )
+  return new Date().format( 'yyyy-MM-dd' )
+}
+
+/**
+  * For a given veresion string such as "5.23.1-23+master" this method returns "5.23" (i.e. the major and minor)
+  */
+String extractReleaseVersion(final String version)
+{
+  final String releaseVersion = (version =~ '^([^\\.]+\\.[^\\.]+)(\\..*)*')[0][1]
+  echo "Extracted releaseVersion=${releaseVersion} from the given version=${version}"
+  return releaseVersion
 }
 
 /**
