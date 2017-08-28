@@ -96,7 +96,7 @@ class MvnConf implements Serializable
 		*/
 	String getDeployParam()
 	{
-		String mvnDeployRepoURL = "${this.mvnResolveRepoBaseURL}/content/repositories/${this.mvnRepoName}-releases"
+		String mvnDeployRepoURL = "${this.mvnDeployRepoBaseURL}/content/repositories/${this.mvnRepoName}-releases"
 		return "-DaltDeploymentRepository=\"${MF_MAVEN_REPO_ID}::default::${mvnDeployRepoURL}\"";
 	}
 
