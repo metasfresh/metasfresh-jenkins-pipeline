@@ -2,7 +2,7 @@ package de.metas.jenkins
 
 class MvnConf implements Serializable
 {
-	final MF_MAVEN_REPO_ID = "metasfresh-task-repo"
+	final String MF_MAVEN_REPO_ID = "metasfresh-task-repo"
 
 
 	/**
