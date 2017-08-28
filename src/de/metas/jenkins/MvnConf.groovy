@@ -74,7 +74,7 @@ class MvnConf implements Serializable
 
 	String getDeployRepoURL()
 	{
-		return "${this.mvnDeployRepoBaseURL}/content/repositories/${this.mvnRepoName}"
+		return "${this.mvnDeployRepoBaseURL}/content/repositories/${this.mvnRepoName}-releases"
 	}
 
 	String getResolveRepoURL()
@@ -96,8 +96,7 @@ class MvnConf implements Serializable
 		*/
 	String getDeployParam()
 	{
-		String mvnDeployRepoURL = "${this.mvnDeployRepoBaseURL}/content/repositories/${this.mvnRepoName}-releases"
-		return "-DaltDeploymentRepository=\"${MF_MAVEN_REPO_ID}::default::${mvnDeployRepoURL}\"";
+		return "-DaltDeploymentRepository=\"${MF_MAVEN_REPO_ID}::default::${getDeployRepoURL()}\"";
 	}
 
 	MvnConf withPomFile(String pomFile)
