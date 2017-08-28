@@ -20,13 +20,21 @@ String mkReleaseDate()
 }
 
 /**
-  * For a given veresion string such as "5.23.1-23+master" this method returns "5.23" (i.e. the major and minor)
+  * For a given veresion string such as "5.23.1-23+master" this method returns "5.23" (i.e. the major and minor).
   */
 String extractReleaseVersion(final String version)
 {
   final String releaseVersion = (version =~ '^([^\\.]+\\.[^\\.]+)(\\..*)*')[0][1]
   echo "Extracted releaseVersion=${releaseVersion} from the given version=${version}"
   return releaseVersion
+}
+
+/**
+  * Invokes {@code java.net.URLEncoder.encode(url, "UTF-8")} on the given {@code url} string.
+  */
+String encodeURL(final String url)
+{
+   return java.net.URLEncoder.encode(url, "UTF-8")
 }
 
 /**
