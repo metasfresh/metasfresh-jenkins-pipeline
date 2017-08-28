@@ -25,7 +25,7 @@ String mkReleaseDate()
 String extractReleaseVersion(final String version)
 {
   final String releaseVersion = (version =~ '^([^\\.]+\\.[^\\.]+)(\\..*)*')[0][1]
-  echo "Extracted releaseVersion=${releaseVersion} from the given version=${version}"
+  echo "extractReleaseVersion: Extracted releaseVersion=${releaseVersion} from the given version=${version}"
   return releaseVersion
 }
 
@@ -34,7 +34,9 @@ String extractReleaseVersion(final String version)
   */
 String encodeURL(final String url)
 {
-   return java.net.URLEncoder.encode(url, "UTF-8")
+   final String encodedURL = java.net.URLEncoder.encode(url, "UTF-8")
+   echo "encodeURL: Encoded given url=${url} into ${encodedURL}"
+   return encodedURL;
 }
 
 /**

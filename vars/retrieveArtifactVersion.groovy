@@ -14,7 +14,7 @@ String call(final String branchName, final String buildNo)
 		.replaceAll('[^a-zA-Z0-9]', ''); // remove everything that's not allowed
 
 	final String artifactVersion="${majorAndMinorVersion}.${patchVersion}-${buildNo}+${branchNameToUse}"
-	echo "Set artifactVersion={artifactVersion}"
+	echo "Set artifactVersion=${artifactVersion}"
 
 	return artifactVersion
 }
