@@ -30,13 +30,29 @@ String extractReleaseVersion(final String version)
 }
 
 /**
-  * Invokes {@code java.net.URLEncoder.encode(url, "UTF-8")} on the given {@code url} string.
+  * Invokes {@code java.net.URLEncoder.encode(urlPart, "UTF-8")} on the given {@code urlPart} string.
   */
-String encodeURL(final String url)
+String urlEncode(final String urlPart)
 {
-   final String encodedURL = java.net.URLEncoder.encode(url, "UTF-8")
-   echo "encodeURL: Encoded given url=${url} into ${encodedURL}"
-   return encodedURL;
+   final String encodedURLpart = java.net.URLEncoder.encode(urlPart, "UTF-8")
+   echo "urlEncode: Encoded given urlPart=${urlPart} into ${encodedURLpart}"
+   return encodedURLpart;
+}
+
+/**
+  * Iterates the given map and creates a new map with the given map's keys and URL-encoded values.
+  *
+  * Thanks to https://stackoverflow.com/questions/40159258/impossibility-to-iterate-over-a-map-using-groovy-within-jenkins-pipeline
+  */
+Map urlEncodeMapValues(final Map mapToEncode)
+{
+  final def mapEntriesToEncode = mapToEncode.entrySet().toArray();
+  final def result = [:];
+  for ( int i = 0; i < mapEntriesToEncode.length; i++ )
+  {
+    result.put(mapEntriesToEncode[i].key, urlEncode(mapEntriesToEncode[i].value));
+  }
+  return result;
 }
 
 /**
