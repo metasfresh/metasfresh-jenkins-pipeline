@@ -10,8 +10,11 @@ String call(final String branchName, final String buildNo)
 	final patchVersion = branchName.equals('master') ? "1" : "2"
 	echo "Set PatchVersion=${patchVersion}"
 
-	final String artifactVersion="${majorAndMinorVersion}.${patchVersion}-${buildNo}+${branchName}"
-	echo "Set artifactVersion={artifactVersion}"
+ 	final String branchNameToUse = branchName
+		.replaceAll('[^a-zA-Z0-9]', ''); // remove everything that's not allowed
+
+	final String artifactVersion="${majorAndMinorVersion}.${patchVersion}-${buildNo}+${branchNameToUse}"
+	echo "Set artifactVersion=${artifactVersion}"
 
 	return artifactVersion
 }

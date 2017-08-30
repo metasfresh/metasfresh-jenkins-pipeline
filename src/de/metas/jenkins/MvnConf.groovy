@@ -2,7 +2,7 @@ package de.metas.jenkins
 
 class MvnConf implements Serializable
 {
-	final MF_MAVEN_REPO_ID = "metasfresh-task-repo"
+	final String MF_MAVEN_REPO_ID = "metasfresh-task-repo"
 
 
 	/**
@@ -66,15 +66,15 @@ class MvnConf implements Serializable
 		return """MvnConf[
   pomFile=${pomFile},
   settingsFile=${settingsFile},
-  mvnRepoName=${mvnRepoName}
-	mvnResolveRepoBaseURL=${mvnResolveRepoBaseURL},
-	mvnDeployRepoBaseURL=${mvnDeployRepoBaseURL}
+  mvnRepoName=${mvnRepoName},
+  mvnResolveRepoBaseURL=${mvnResolveRepoBaseURL},
+  mvnDeployRepoBaseURL=${mvnDeployRepoBaseURL}
 ]""";
 	}
 
 	String getDeployRepoURL()
 	{
-		return "${this.mvnDeployRepoBaseURL}/content/repositories/${this.mvnRepoName}"
+		return "${this.mvnDeployRepoBaseURL}/content/repositories/${this.mvnRepoName}-releases"
 	}
 
 	String getResolveRepoURL()
@@ -96,8 +96,7 @@ class MvnConf implements Serializable
 		*/
 	String getDeployParam()
 	{
-		String mvnDeployRepoURL = "${this.mvnResolveRepoBaseURL}/content/repositories/${this.mvnRepoName}-releases"
-		return "-DaltDeploymentRepository=\"${MF_MAVEN_REPO_ID}::default::${mvnDeployRepoURL}\"";
+		return "-DaltDeploymentRepository=\"${MF_MAVEN_REPO_ID}::default::${getDeployRepoURL()}\"";
 	}
 
 	MvnConf withPomFile(String pomFile)

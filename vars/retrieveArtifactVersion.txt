@@ -1,1 +1,5 @@
 Invokes retrieveReleaseInfo with the given `branchName` and then constructs the version string to be used when making the current build.
+
+Notes: 
+* the `branchName` parameter may not be null.
+* the final version string that is returned contains the branch name in the version's "BuildMetadata" section (i.e. `-${branchName}`), but without any char that is not an ascii letter or digit.

@@ -11,9 +11,48 @@ String mkDockerTag(String input)
  		.replaceAll('[^a-zA-Z0-9_#\\.]', '_'); // replace everything that's not allowed with an underscore
 }
 
+/**
+  * Just returns the current date, formatted as yyyy-dd-MM (e.g. "2017-08-22").
+  */
 String mkReleaseDate()
 {
-  return new Date().format( 'MM-dd-yyyy' )
+  return new Date().format( 'yyyy-MM-dd' )
+}
+
+/**
+  * For a given veresion string such as "5.23.1-23+master" this method returns "5.23" (i.e. the major and minor).
+  */
+String extractReleaseVersion(final String version)
+{
+  final String releaseVersion = (version =~ '^([^\\.]+\\.[^\\.]+)(\\..*)*')[0][1]
+  echo "extractReleaseVersion: Extracted releaseVersion=${releaseVersion} from the given version=${version}"
+  return releaseVersion
+}
+
+/**
+  * Invokes {@code java.net.URLEncoder.encode(urlPart, "UTF-8")} on the given {@code urlPart} string.
+  */
+String urlEncode(final String urlPart)
+{
+   final String encodedURLpart = java.net.URLEncoder.encode(urlPart, "UTF-8")
+   echo "urlEncode: Encoded given urlPart=${urlPart} into ${encodedURLpart}"
+   return encodedURLpart;
+}
+
+/**
+  * Iterates the given map and creates a new map with the given map's keys and URL-encoded values.
+  *
+  * Thanks to https://stackoverflow.com/questions/40159258/impossibility-to-iterate-over-a-map-using-groovy-within-jenkins-pipeline
+  */
+Map urlEncodeMapValues(final Map mapToEncode)
+{
+  final def mapEntriesToEncode = mapToEncode.entrySet().toArray();
+  final def result = [:];
+  for ( int i = 0; i < mapEntriesToEncode.length; i++ )
+  {
+    result.put(mapEntriesToEncode[i].key, urlEncode(mapEntriesToEncode[i].value));
+  }
+  return result;
 }
 
 /**
@@ -117,12 +156,14 @@ String retrieveEffectiveBranchName(final String metasFreshRepoName, final String
   	// Here i'm not checking if the build job exists but if the respective branch on github exists. If the branch is there, then I assume that the multibranch plugin also created the job
   	def exitCode;
 
-		// We run this within a node to avoid the error saying:
-		// Required context class hudson.FilePath is missing
-		// Perhaps you forgot to surround the code with a step that provides this, such as: node
-		// ...
-		// org.jenkinsci.plugins.workflow.steps.MissingContextVariableException: Required context class hudson.FilePath is missing
-		exitCode = sh returnStatus: true, script: "git ls-remote --exit-code https://github.com/metasfresh/${metasFreshRepoName} ${branchName}"
+	// We run this within a node to avoid the error saying:
+	// Required context class hudson.FilePath is missing
+	// Perhaps you forgot to surround the code with a step that provides this, such as: node
+	// ...
+	// org.jenkinsci.plugins.workflow.steps.MissingContextVariableException: Required context class hudson.FilePath is missing
+    nodeIfNeeded('linux', {
+        exitCode = sh returnStatus: true, script: "git ls-remote --exit-code https://github.com/metasfresh/${metasFreshRepoName} ${branchName}"
+    })
 
     final String effectiveBranchName;
   	if(exitCode == 0)
