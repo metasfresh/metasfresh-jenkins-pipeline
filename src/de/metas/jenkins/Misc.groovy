@@ -179,3 +179,31 @@ String retrieveEffectiveBranchName(final String metasFreshRepoName, final String
 
     return effectiveBranchName;
 }
+
+/**
+  * Also see https://github.com/metasfresh/mf15-platform/issues/40
+  */
+String createReleaseLinkWithText(
+	final String branchName, /* MF_UPSTREAM_BRANCH */
+	final String releaseVersion, /* MF_RELEASE_VERSION */
+	final String fullVersion,
+	final Map artifactUrls /* MF_ARTIFACT_URLS */ )
+{
+	final String urlVersion
+	final String jobName
+	final String description
+	if(branchName == 'release')
+	{
+		jobName = 'release_weekly_release_package'
+		urlVersion = urlEncode(mkDockerTag(releaseVersion))
+		description = 'lets you jump to a jenkins-job that will create the weekly release package from this build'
+	}
+	else
+	{
+		jobName='release_docker_images'
+		urlVersion = urlEncode(mkDockerTag(fullVersion))
+		description = 'lets you jump to a jenkins-job that will create and publish deployable docker images from this build'
+	}
+	final String releaseLinkWithText = "<a href=\"https://jenkins.metasfresh.com/job/ops/job/${jobName}/parambuild/?VERSION_RELEASE=${urlVersion}&URL_APP_DIST=${artifactUrls['metasfresh-dist']}&URL_WEBAPI_JAR=${artifactUrls['metasfresh-webui']}&URL_WEBUI_FRONTEND=${artifactUrls['metasfresh-webui-frontend']}\"><b>this link</b></a> ${description}."
+	return releaseLinkWithText;
+}
