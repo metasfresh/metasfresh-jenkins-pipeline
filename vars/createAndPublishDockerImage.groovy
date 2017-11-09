@@ -20,7 +20,7 @@ private void createAndPublishDockerImage(
 				final String dockerBranchName,
 				final String dockerVersionSuffix)
 {
-	final dockerWorkDir="docker-build/${dockerRepositoryName}"
+	final dockerWorkDir="docker-workdir/${dockerRepositoryName}"
 	final dockerSourceArtifactName="${dockerRepositoryName}-service"
 
 	sh "mkdir -p ${dockerWorkDir}"
