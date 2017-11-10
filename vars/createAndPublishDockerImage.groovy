@@ -2,13 +2,13 @@
 
 void call(
   final String dockerRepositoryName,
-  final String dockerSourceDir,
+  final String dockerModuleDir,
   final String dockerBranchName,
   final String dockerVersionSuffix)
 {
   createAndPublishDockerImage(
     dockerRepositoryName,
-    dockerSourceDir,
+    dockerModuleDir,
     dockerBranchName,
     dockerVersionSuffix
   )
@@ -16,19 +16,13 @@ void call(
 
 private void createAndPublishDockerImage(
 				final String dockerRepositoryName,
-				final String dockerSourceDir,
+				final String dockerModuleDir,
 				final String dockerBranchName,
 				final String dockerVersionSuffix)
 {
-	final dockerWorkDir="docker-workdir/${dockerRepositoryName}"
+	final dockerWorkDir="${dockerModuleDir}/target/docker"
 	final dockerSourceArtifactName="${dockerRepositoryName}-service"
 
-	sh "mkdir -p ${dockerWorkDir}"
-
-	// copy the files so they can be handled by the docker build
-	sh "cp ${dockerSourceDir}/target/${dockerSourceArtifactName}.jar ${dockerWorkDir}/${dockerSourceArtifactName}.jar" // please keep in sync with DockerFile!
-	sh "cp -R ${dockerSourceDir}/src/main/docker/* ${dockerWorkDir}"
-	sh "cp -R ${dockerSourceDir}/src/main/configs ${dockerWorkDir}"
 	docker.withRegistry('https://index.docker.io/v1/', 'dockerhub_metasfresh')
 	{
 		// note: we ommit the "-service" in the docker image name, because we also don't have "-service" in the webui-api and backend and it's pretty clear that it is a service
