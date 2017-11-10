@@ -1,12 +1,12 @@
 #!/usr/bin/groovy
 
-void call(
+String call(
   final String dockerRepositoryName,
   final String dockerModuleDir,
   final String dockerBranchName,
   final String dockerVersionSuffix)
 {
-  createAndPublishDockerImage(
+  return createAndPublishDockerImage(
     dockerRepositoryName,
     dockerModuleDir,
     dockerBranchName,
@@ -14,27 +14,32 @@ void call(
   )
 }
 
-private void createAndPublishDockerImage(
+private String createAndPublishDockerImage(
 				final String dockerRepositoryName,
 				final String dockerModuleDir,
 				final String dockerBranchName,
 				final String dockerVersionSuffix)
 {
 	final dockerWorkDir="${dockerModuleDir}/target/docker"
-	final dockerSourceArtifactName="${dockerRepositoryName}-service"
+
+	final def misc = new de.metas.jenkins.Misc();
+
+	final dockerName = "metasfresh/${dockerRepositoryName}-dev"
+	final buildSpecificDockerTag = misc.mkDockerTag("${dockerBranchName}-${dockerVersionSuffix}")
 
 	docker.withRegistry('https://index.docker.io/v1/', 'dockerhub_metasfresh')
 	{
-		// note: we ommit the "-service" in the docker image name, because we also don't have "-service" in the webui-api and backend and it's pretty clear that it is a service
-		final def app = docker.build "metasfresh/${dockerRepositoryName}-dev", "${dockerWorkDir}";
+		// note: we omit the "-service" in the docker image name, because we also don't have "-service" in the webui-api and backend and it's pretty clear that it is a service
+		final def app = docker.build dockerName, dockerWorkDir
 
-		final def misc = new de.metas.jenkins.Misc();
 		app.push misc.mkDockerTag("${dockerBranchName}-latest");
-		app.push misc.mkDockerTag("${dockerBranchName}-${dockerVersionSuffix}");
+		app.push buildSpecificDockerTag
 		if(dockerBranchName == 'release')
 		{
 			echo 'dockerBranchName == release, so we also push this with the "latest" tag'
 			app.push misc.mkDockerTag('latest');
 		}
-	} // docker.withRegistry
+	}
+
+	return "${dockerName}:${buildSpecificDockerTag}"
 }
