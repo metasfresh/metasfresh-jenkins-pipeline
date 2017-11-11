@@ -30,7 +30,8 @@ private String createAndPublishDockerImage(
 	docker.withRegistry('https://index.docker.io/v1/', 'dockerhub_metasfresh')
 	{
 		// note: we omit the "-service" in the docker image name, because we also don't have "-service" in the webui-api and backend and it's pretty clear that it is a service
-		final def app = docker.build dockerName, dockerWorkDir
+    // note 2: we need the --pull to avoid building with a stale "latest" base image, see https://docs.docker.com/engine/reference/commandline/build/
+    final def app = docker.build --pull dockerName, dockerWorkDir
 
 		app.push misc.mkDockerTag("${dockerBranchName}-latest");
 		app.push buildSpecificDockerTag
