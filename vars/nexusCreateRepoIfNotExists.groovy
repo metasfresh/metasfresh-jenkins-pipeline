@@ -25,8 +25,13 @@ boolean isRepoExists(final String mvnRepoBaseURL, String mvnRepoName)
 	return repoExists;
 }
 
-void createRepo(final String mvnRepoBaseURL, String mvnRepoName)
+void createRepo(final String mvnRepoBaseURL, final String mvnRepoName)
 {
+		// Do *not* make the repo indexable, unless we can make sure that the index keeps up.
+		// As of this writing, it doesn't, and thus a maven build might fail trying to
+		// get an artifact that's in the index, but actually was already removed.
+		final String repositoryIsIndexable = 'false';
+
 		echo "Create the repository ${mvnRepoName}-releases";
 		final String createHostedRepoPayload = """<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <repository>
@@ -36,8 +41,8 @@ void createRepo(final String mvnRepoBaseURL, String mvnRepoName)
 		<exposed>true</exposed>
 		<repoType>hosted</repoType>
 		<writePolicy>ALLOW_WRITE_ONCE</writePolicy>
-	    <browseable>true</browseable>
-	    <indexable>true</indexable>
+		<browseable>true</browseable>
+		<indexable>${repositoryIsIndexable}</indexable>
 		<repoPolicy>RELEASE</repoPolicy>
 		<providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
 		<provider>maven2</provider>
