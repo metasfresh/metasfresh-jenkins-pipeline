@@ -46,13 +46,18 @@ private String createAndPublishDockerImage(
   withCredentials([usernamePassword(credentialsId: 'dockerhub_metasfresh', passwordVariable: 'dockerRegistryPassword', usernameVariable: 'dockerRegistryUserName')])
   {
     sh "docker login --username ${dockerRegistryUserName} --password ${dockerRegistryPassword}"
-    sh "docker build --pull --tag ${imageNameWithTag} ${additionalBuildArgs} ${dockerWorkDir}"
-    sh "docker push ${imageNameWithTag}"
-
-    final String latestTag = misc.mkDockerTag("${branchName}-latest")
-    sh "docker tag ${imageName} ${imageName}:${latestTag}"
-    sh "docker push ${imageName}:${latestTag}"
   }
+
+  sh "docker build --pull --tag ${imageNameWithTag} ${additionalBuildArgs} ${dockerWorkDir}"
+  sh "docker push ${imageNameWithTag}"
+
+  // Also publish a branch specific "LATEST".
+  // Uuse uppercase because this way it's the same keyword that we use in maven.
+  // Downstream jobs might look for "LATEST" in their base image tag
+  final String latestTag = misc.mkDockerTag("${branchName}-LATEST")
+  sh "docker tag ${imageName} ${imageName}:${latestTag}"
+  sh "docker push ${imageName}:${latestTag}"
+
 	return imageName
 }
 
