@@ -55,7 +55,7 @@ private String createAndPublishDockerImage(
   // Uuse uppercase because this way it's the same keyword that we use in maven.
   // Downstream jobs might look for "LATEST" in their base image tag
   final String latestTag = misc.mkDockerTag("${branchName}-LATEST")
-  sh "docker tag ${imageName} ${imageName}:${latestTag}"
+  sh "docker tag ${imageNameWithTag} ${imageName}:${latestTag}"
   sh "docker push ${imageName}:${latestTag}"
 
 	return imageNameWithTag
