@@ -46,7 +46,7 @@ private String createAndPublishDockerImage(
   withCredentials([usernamePassword(credentialsId: 'dockerhub_metasfresh', passwordVariable: 'dockerRegistryPassword', usernameVariable: 'dockerRegistryUserName')])
   {
     sh "docker login --username ${dockerRegistryUserName} --password ${dockerRegistryPassword}"
-    sh "docker build --pull -tag ${imageNameWithTag} ${additionalBuildArgs} ${dockerWorkDir}"
+    sh "docker build --pull --tag ${imageNameWithTag} ${additionalBuildArgs} ${dockerWorkDir}"
     sh "docker push ${imageNameWithTag}"
 
     final String latestTag = misc.mkDockerTag("${branchName}-latest")
