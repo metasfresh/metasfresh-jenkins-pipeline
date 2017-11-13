@@ -58,7 +58,7 @@ private String createAndPublishDockerImage(
   sh "docker tag ${imageName} ${imageName}:${latestTag}"
   sh "docker push ${imageName}:${latestTag}"
 
-	return imageName
+	return imageNameWithTag
 }
 
 performWithJenkinsDockerSupport(
