@@ -23,12 +23,21 @@ private String createAndPublishDockerImage(
 				final String versionSuffix,
 				final String additionalBuildArgs)
 {
+  echo 'createAndPublishDockerImage is called with'
+  echo "      publishRepositoryName=${publishRepositoryName}"
+  echo "      moduleDir=${moduleDir}"
+  echo "      branchName=${branchName}"
+  echo "      versionSuffix=${versionSuffix}"
+  echo "      additionalBuildArgs=${additionalBuildArgs}"
+
 	final dockerWorkDir="${moduleDir}/target/docker"
 
-	final def misc = new de.metas.jenkins.Misc();
+	final def misc = new de.metas.jenkins.Misc()
 
-	final dockerName = "metasfresh/${publishRepositoryName}"
 	final buildSpecificDockerTag = misc.mkDockerTag("${branchName}-${versionSuffix}")
+
+  final imageName = "metasfresh/${publishRepositoryName}:${buildSpecificDockerTag}"
+  echo "The docker image name we will push is ${imageName}"
 
 	docker.withRegistry('https://index.docker.io/v1/', 'dockerhub_metasfresh')
 	{
@@ -36,11 +45,13 @@ private String createAndPublishDockerImage(
     final String baseImageVersion=''
 		// note: we omit the "-service" in the docker image name, because we also don't have "-service" in the webui-api and backend and it's pretty clear that it is a service
     // note 2: we need the --pull to avoid building with a stale "latest" base image, see https://docs.docker.com/engine/reference/commandline/build/
-    final def app = docker.build dockerName, "--pull ${additionalBuildArgs} ${dockerWorkDir}"
+    final def app = docker.build imageName, "--pull ${additionalBuildArgs} ${dockerWorkDir}"
+    app.push
 
-		app.push misc.mkDockerTag("${branchName}-latest");
-		app.push buildSpecificDockerTag
+    final String additionalLatestTag = misc.mkDockerTag("${branchName}-latest")
+    echo "Also pushing this image with tag ${additionalLatestTag}"
+		app.push additionalLatestTag
 	}
 
-	return "${dockerName}:${buildSpecificDockerTag}"
+	return imageName
 }
