@@ -4,11 +4,10 @@ def call(final String mvnRepoBaseURL, String mvnRepoName)
 {
 	withCredentials([usernameColonPassword(credentialsId: 'nexus_jenkins', variable: 'NEXUS_LOGIN')])
 	{
-		if(isRepoExists(mvnRepoBaseURL, mvnRepoName))
+		if(!isRepoExists(mvnRepoBaseURL, mvnRepoName))
 		{
-			return;
+			createRepo(mvnRepoBaseURL, mvnRepoName);
 		}
-		createRepo(mvnRepoBaseURL, mvnRepoName);
 	}
 }
 
@@ -52,44 +51,7 @@ void createRepo(final String mvnRepoBaseURL, final String mvnRepoName)
 
 		final String PUBLIC_REPO_BASE_URL="https://repo.metasfresh.com";
 
-		final boolean createProxyRepo = mvnRepoBaseURL != PUBLIC_REPO_BASE_URL;
-		if(createProxyRepo)
-		{
-			// we need it to have all the task/branch specific artifacts that were build on the public jenkins
-			echo "Create the repository ${mvnRepoName}-proxy";
-			final String createProxyRepoPayload = """<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<repository>
-  <data>
-	<id>${mvnRepoName}-proxy</id>
-	<name>${mvnRepoName}-proxy</name>
-	<exposed>true</exposed>
-	<repoType>proxy</repoType>
-	<writePolicy>READ_ONLY</writePolicy>
-    <browseable>true</browseable>
-    <indexable>true</indexable>
-	<repoPolicy>RELEASE</repoPolicy>
-	<checksumPolicy>WARN</checksumPolicy>
-	<downloadRemoteIndexes>true</downloadRemoteIndexes>
-	<providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
-	<provider>maven2</provider>
-	<format>maven2</format>
-	<remoteStorage>
-      <remoteStorageUrl>${PUBLIC_REPO_BASE_URL}/content/repositories/${mvnRepoName}/</remoteStorageUrl>
-    </remoteStorage>
-  </data>
-</repository>
-""";
-
-			// # nexus ignored application/json
-			final String createProxyRepoCommand =  "curl --silent -H \"Content-Type: application/xml\" -X POST -u ${NEXUS_LOGIN} -d \'${createProxyRepoPayload}\' ${mvnRepoBaseURL}/service/local/repositories"
-			sh "${createProxyRepoCommand}"
-		}
-		else
-		{
-			echo "SKIP creating a ${mvnRepoName}-proxy, because mvnRepoBaseURL=${PUBLIC_REPO_BASE_URL}"
-		}
-
-		// create a repo group that contains both the local/hosted repo and the remote/proxy repo
+		// create a repo group that contains both the 3rd-party stuff and the locally build artifacts
 		// this reposity will be used by the build
 		echo "Create the repository-group ${mvnRepoName}";
 		final String createGroupPayload = """<?xml version="1.0" encoding="UTF-8"?>
@@ -104,7 +66,7 @@ void createRepo(final String mvnRepoBaseURL, final String mvnRepoName)
         <resourceURI>${mvnRepoBaseURL}/content/repositories/mvn-public/</resourceURI>
 			</repo-group-member>
 
-			<!-- include ${mvnRepoName}-releases which is the repo to which we release everything we build within this branch -->
+			<!-- include ${mvnRepoName}-releases which is the repo to which we deploy everything we build within this branch -->
       <repo-group-member>
         <name>${mvnRepoName}-releases</name>
         <id>${mvnRepoName}-releases</id>
