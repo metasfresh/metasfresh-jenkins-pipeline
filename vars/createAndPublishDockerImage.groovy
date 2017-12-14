@@ -40,29 +40,37 @@ private String createAndPublishDockerImage(
   final imageNameWithTag = "${imageName}:${buildSpecificDockerTag}"
   echo "The docker image name we will push is ${imageName}"
 
-  // this stuff doesn't work when we configure the base image version from outside
-  // see https://issues.jenkins-ci.org/browse/JENKINS-46105
-  //performWithJenkinsDockerSupport(imageNameWithTag, branchName, dockerWorkDir, additionalBuildArgs)
-  withCredentials([usernamePassword(credentialsId: 'dockerhub_metasfresh', passwordVariable: 'dockerRegistryPassword', usernameVariable: 'dockerRegistryUserName')])
-  {
-    sh "docker login --username ${dockerRegistryUserName} --password ${dockerRegistryPassword}"
-  }
-
   sh "docker build --pull --tag ${imageNameWithTag} ${additionalBuildArgs} ${dockerWorkDir}"
-  sh "docker push ${imageNameWithTag}"
 
   // Also publish a branch specific "LATEST".
   // Use uppercase because this way it's the same keyword that we use in maven.
   // Downstream jobs might look for "LATEST" in their base image tag
   final String latestTag = misc.mkDockerTag("${branchName}-LATEST")
   sh "docker tag ${imageNameWithTag} ${imageName}:${latestTag}"
-  sh "docker push ${imageName}:${latestTag}"
+
+  // note that both the lock and the docker logout are attempts to get around
+  // issue frequent dockerhub timeouts https://github.com/metasfresh/metasfresh-jenkins-pipeline/issues/3
+  // the lock step is provided by https://wiki.jenkins.io/display/JENKINS/Lockable+Resources+Plugin
+  lock('publish-docker-image')
+  {
+    // this stuff doesn't work when we configure the base image version from outside
+    // see https://issues.jenkins-ci.org/browse/JENKINS-46105
+    //performWithJenkinsDockerSupport(imageNameWithTag, branchName, dockerWorkDir, additionalBuildArgs)
+    withCredentials([usernamePassword(credentialsId: 'dockerhub_metasfresh', passwordVariable: 'dockerRegistryPassword', usernameVariable: 'dockerRegistryUserName')])
+    {
+      sh "docker login --username ${dockerRegistryUserName} --password ${dockerRegistryPassword}"
+    }
+
+    sh "docker push ${imageNameWithTag}"
+    sh "docker push ${imageName}:${latestTag}"
+
+    sh "docker logout"
+  }
+	return imageNameWithTag
 
   // cleanup to avoid disk space issues
   sh "docker rmi ${imageName}:${latestTag}"
   sh "docker rmi ${imageNameWithTag}"
-
-	return imageNameWithTag
 }
 
 performWithJenkinsDockerSupport(
