@@ -51,26 +51,40 @@ private String createAndPublishDockerImage(
   // note that both the lock and the docker logout are attempts to get around
   // issue frequent dockerhub timeouts https://github.com/metasfresh/metasfresh-jenkins-pipeline/issues/3
   // the lock step is provided by https://wiki.jenkins.io/display/JENKINS/Lockable+Resources+Plugin
-  lock('publish-docker-image')
-  {
-    // this stuff doesn't work when we configure the base image version from outside
-    // see https://issues.jenkins-ci.org/browse/JENKINS-46105
-    //performWithJenkinsDockerSupport(imageNameWithTag, branchName, dockerWorkDir, additionalBuildArgs)
-    withCredentials([usernamePassword(credentialsId: 'dockerhub_metasfresh', passwordVariable: 'dockerRegistryPassword', usernameVariable: 'dockerRegistryUserName')])
-    {
-      sh "docker login --username ${dockerRegistryUserName} --password ${dockerRegistryPassword}"
-    }
-
-    sh "docker push ${imageNameWithTag}"
-    sh "docker push ${imageName}:${latestTag}"
-
-    sh "docker logout"
-  }
-	return imageNameWithTag
+  pushToDockerRegistryRetryIfNeeded(imageNameWithTag)
+  pushToDockerRegistryRetryIfNeeded("${imageName}:${latestTag}")
 
   // cleanup to avoid disk space issues
   sh "docker rmi ${imageName}:${latestTag}"
   sh "docker rmi ${imageNameWithTag}"
+
+  return imageNameWithTag
+}
+
+void pushToDockerRegistryRetryIfNeeded(final String imageNameWithTag)
+{
+  retry(5)
+  {
+    lock('publish-docker-image')
+    {
+      performPushToDockerRegistry(imageNameWithTag)
+    }
+  }
+}
+
+void performPushToDockerRegistry(final String imageNameWithTag)
+{
+  // this stuff doesn't work when we configure the base image version from outside
+  // see https://issues.jenkins-ci.org/browse/JENKINS-46105
+  //performWithJenkinsDockerSupport(imageNameWithTag, branchName, dockerWorkDir, additionalBuildArgs)
+  withCredentials([usernamePassword(credentialsId: 'dockerhub_metasfresh', passwordVariable: 'dockerRegistryPassword', usernameVariable: 'dockerRegistryUserName')])
+  {
+    sh "docker login --username ${dockerRegistryUserName} --password ${dockerRegistryPassword}"
+  }
+
+  sh "docker push ${imageNameWithTag}"
+
+  sh "docker logout"
 }
 
 performWithJenkinsDockerSupport(
