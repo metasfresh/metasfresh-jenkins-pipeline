@@ -40,7 +40,10 @@ private String createAndPublishDockerImage(
   final imageNameWithTag = "${imageName}:${buildSpecificDockerTag}"
   echo "The docker image name we will push is ${imageName}"
 
-  sh "docker build --pull --tag ${imageNameWithTag} ${additionalBuildArgs} ${dockerWorkDir}"
+  retry(5) // building also requires http-access to docker hub and suffers from timeouts, so we retry that a s well
+  {
+    sh "docker build --pull --tag ${imageNameWithTag} ${additionalBuildArgs} ${dockerWorkDir}"
+  }
 
   // Also publish a branch specific "LATEST".
   // Use uppercase because this way it's the same keyword that we use in maven.
