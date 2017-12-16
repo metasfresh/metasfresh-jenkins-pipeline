@@ -7,13 +7,14 @@ String call(
   final String versionSuffix,
   final String additionalBuildArgs = '')
 {
-  return createAndPublishDockerImage(
-    publishRepositoryName,
-    moduleDir,
-    branchName,
-    versionSuffix,
-    additionalBuildArgs
-  )
+  return "NOT BUILD OR PUSHED"
+//  return createAndPublishDockerImage(
+//    publishRepositoryName,
+//    moduleDir,
+//    branchName,
+//    versionSuffix,
+//    additionalBuildArgs
+//  )
 }
 
 private String createAndPublishDockerImage(
