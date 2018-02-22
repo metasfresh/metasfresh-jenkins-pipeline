@@ -42,7 +42,7 @@ private String createAndPublishDockerImage(
 
   final String latestTag = misc.mkDockerTag("${branchName}-LATEST")
 
-  final Image image
+  def image
   docker.withRegistry('https://nexus.metasfresh.com:6000/v2/', 'nexus.metasfresh.com_jenkins')
   {
     image = docker.build(imageNameWithTag, "--pull ${additionalBuildArgs} ${dockerWorkDir}")
