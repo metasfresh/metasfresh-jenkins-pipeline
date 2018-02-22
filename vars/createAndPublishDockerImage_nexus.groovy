@@ -59,8 +59,8 @@ private String createAndPublishDockerImage(
   }
 
   // cleanup to avoid disk space issues
-  sh "docker rmi ${imageName}:${latestTag}"
-  sh "docker rmi ${imageNameWithTag}"
+  //  sh "docker rmi ${imageName}:${latestTag}"
+  //  sh "docker rmi ${imageNameWithTag}"
 
   return imageNameWithTag
 }
