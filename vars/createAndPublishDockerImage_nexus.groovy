@@ -23,12 +23,12 @@ private String createAndPublishDockerImage(
 				final String versionSuffix,
 				final String additionalBuildArgs)
 {
-  echo 'createAndPublishDockerImage is called with'
-  echo "      publishRepositoryName=${publishRepositoryName}"
-  echo "      moduleDir=${moduleDir}"
-  echo "      branchName=${branchName}"
-  echo "      versionSuffix=${versionSuffix}"
-  echo "      additionalBuildArgs=${additionalBuildArgs}"
+  echo """createAndPublishDockerImage is called with'
+      publishRepositoryName=${publishRepositoryName}"
+      moduleDir=${moduleDir}"
+      branchName=${branchName}"
+      versionSuffix=${versionSuffix}"
+      additionalBuildArgs=${additionalBuildArgs}"""
 
 	final dockerWorkDir="${moduleDir}/target/docker"
 
@@ -45,7 +45,7 @@ private String createAndPublishDockerImage(
   def app;
   docker.withRegistry('https://nexus.metasfresh.com:6000/v2/', 'nexus.metasfresh.com_jenkins')
   {
-    app = docker.build(imageNameWithTag, '--pull ${additionalBuildArgs} ${dockerWorkDir}')
+    app = docker.build(imageNameWithTag, "--pull ${additionalBuildArgs} ${dockerWorkDir}")
   }
 
   docker.withRegistry('https://nexus.metasfresh.com:6001/v2/', 'nexus.metasfresh.com_jenkins')
