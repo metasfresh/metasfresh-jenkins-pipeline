@@ -42,11 +42,14 @@ private String createAndPublishDockerImage(
 
   final String latestTag = misc.mkDockerTag("${branchName}-LATEST")
 
-
-  // docker.withRegistry('https://index.docker.io/v1/', 'dockerhub_metasfresh')
-  docker.withRegistry('https://nexus.metasfresh.com:6001', 'nexus.metasfresh.com_jenkins')
+  def app;
+  docker.withRegistry('https://nexus.metasfresh.com:6000/v2/', 'nexus.metasfresh.com_jenkins')
   {
     app = docker.build(imageNameWithTag, '--pull ${additionalBuildArgs} ${dockerWorkDir}')
+  }
+
+  docker.withRegistry('https://nexus.metasfresh.com:6001/v2/', 'nexus.metasfresh.com_jenkins')
+  {
     app.push
 
     // Also publish a branch specific "LATEST".
