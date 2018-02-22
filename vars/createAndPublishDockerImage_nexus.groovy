@@ -34,28 +34,28 @@ private String createAndPublishDockerImage(
 
 	final def misc = new de.metas.jenkins.Misc()
 
-	final buildSpecificDockerTag = misc.mkDockerTag("${branchName}-${versionSuffix}")
+	final buildSpecificTag = misc.mkDockerTag("${branchName}-${versionSuffix}")
 
   final imageName = "metasfresh/${publishRepositoryName}"
-  final imageNameWithTag = "${imageName}:${buildSpecificDockerTag}"
+  final imageNameWithTag = "${imageName}:${buildSpecificTag}"
   echo "The docker image name we will push is ${imageName}"
 
   final String latestTag = misc.mkDockerTag("${branchName}-LATEST")
 
-  def app;
+  final Image image
   docker.withRegistry('https://nexus.metasfresh.com:6000/v2/', 'nexus.metasfresh.com_jenkins')
   {
-    app = docker.build(imageNameWithTag, "--pull ${additionalBuildArgs} ${dockerWorkDir}")
+    image = docker.build(imageNameWithTag, "--pull ${additionalBuildArgs} ${dockerWorkDir}")
   }
 
   docker.withRegistry('https://nexus.metasfresh.com:6001/v2/', 'nexus.metasfresh.com_jenkins')
   {
-    app.push
+    image.push(buildSpecificTag)
 
     // Also publish a branch specific "LATEST".
     // Use uppercase because this way it's the same keyword that we use in maven.
     // Downstream jobs might look for "LATEST" in their base image tag
-    app.push(latestTag)
+    image.push(latestTag)
   }
 
   // cleanup to avoid disk space issues
