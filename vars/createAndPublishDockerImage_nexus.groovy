@@ -44,7 +44,7 @@ private String createAndPublishDockerImage(
 
 
   // docker.withRegistry('https://index.docker.io/v1/', 'dockerhub_metasfresh')
-  docker.withRegistry('nexus.metasfresh.com:6001', 'nexus.metasfresh.com_jenkins')
+  docker.withRegistry('https://nexus.metasfresh.com:6001', 'nexus.metasfresh.com_jenkins')
   {
     app = docker.build(imageNameWithTag, '--pull ${additionalBuildArgs} ${dockerWorkDir}')
     app.push
