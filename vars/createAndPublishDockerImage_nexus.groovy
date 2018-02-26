@@ -56,6 +56,12 @@ private String createAndPublishDockerImage(
     // Use uppercase because this way it's the same keyword that we use in maven.
     // Downstream jobs might look for "LATEST" in their base image tag
     image.push(latestTag)
+
+    if(branchName=='release')
+    {
+      echo 'branchName=release, so we also push this with the "latest" tag'
+      image.push('latest');
+    }
   }
 
   // cleanup to avoid disk space issues
