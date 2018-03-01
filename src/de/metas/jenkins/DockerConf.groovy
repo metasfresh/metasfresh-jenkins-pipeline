@@ -59,7 +59,7 @@ class DockerConf implements Serializable
 			String workDir = '.',
 			String additionalBuildArgs = '',
 			String dockerFile = 'Dockerfile',
-			String pullRegistry = 'nexus.metasfresh.com:6000',
+			String pullRegistry = 'docker.metasfresh.com',
 			String pullRegistryCredentialsId = 'nexus.metasfresh.com_jenkins',
 			String pushRegistry = 'nexus.metasfresh.com:6001',
 			String pushRegistryCredentialsId = 'nexus.metasfresh.com_jenkins')
