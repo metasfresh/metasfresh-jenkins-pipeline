@@ -16,14 +16,12 @@ private String buildAndPush(final DockerConf dockerConf)
 
   final String imageName = "metasfresh/${dockerConf.artifactName}"
 	final String buildSpecificTag = misc.mkDockerTag("${dockerConf.branchName}-${dockerConf.versionSuffix}")
-  final String latestTag = misc.mkDockerTag("${branchName}-LATEST")
-
-  echo "The docker image name we will build and push is ${imageName}"
+  final String latestTag = misc.mkDockerTag("${dockerConf.branchName}-LATEST")
 
   def image
   docker.withRegistry("https://${dockerConf.pullRegistry}/v2/", dockerConf.pullRegistryCredentialsId)
   {
-    image = docker.build("${imageName}:${buildSpecificTag}", "--pull ${additionalBuildArgs} ${dockerWorkDir}")
+    image = docker.build("${imageName}:${buildSpecificTag}", "--pull ${dockerConf.additionalBuildArgs} ${dockerConf.workDir}")
   }
 
   docker.withRegistry("https://${dockerConf.pushRegistry}/v2/", dockerConf.pushRegistryCredentialsId)
@@ -35,9 +33,9 @@ private String buildAndPush(final DockerConf dockerConf)
     // Downstream jobs might look for "LATEST" in their base image tag
     image.push(latestTag)
 
-    if(branchName=='release')
+    if(dockerConf.branchName=='release')
     {
-      echo 'branchName=release, so we also push this with the "latest" tag'
+      echo 'branchName is "release", therefore we also push this image with the "latest" tag'
       image.push('latest');
     }
   }
