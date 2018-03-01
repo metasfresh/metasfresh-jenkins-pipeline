@@ -1,5 +1,7 @@
 #!/usr/bin/groovy
 
+import de.metas.jenkins.DockerConf
+
 String call(final DockerConf dockerConf)
 {
   return buildAndPush(dockerConf)
