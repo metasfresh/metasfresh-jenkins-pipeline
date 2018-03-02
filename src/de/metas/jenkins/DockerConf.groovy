@@ -94,7 +94,7 @@ class DockerConf implements Serializable
 	DockerConf withWorkDir(String altWorkDir)
 	{
 		return new DockerConf(
-			this.altArtifactName,
+			this.artifactName,
 			this.branchName,
 			this.versionSuffix,
 			altWorkDir,
