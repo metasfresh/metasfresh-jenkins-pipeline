@@ -96,7 +96,7 @@ class MvnConf implements Serializable
 		*/
 	String getDeployParam()
 	{
-		return "-DaltDeploymentRepository=\"${MF_MAVEN_REPO_ID}::default::${getDeployRepoURL()}\"";
+		return "-DretryFailedDeploymentCount=5 -DaltDeploymentRepository=\"${MF_MAVEN_REPO_ID}::default::${getDeployRepoURL()}\"";
 	}
 
 	MvnConf withPomFile(String pomFile)
