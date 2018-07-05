@@ -106,6 +106,20 @@ class DockerConf implements Serializable
 			this.pushRegistryCredentialsId)
 	}
 	
+	DockerConf withAdditionalBuildArgs(String additionalBuildArgs)
+	{
+		return new DockerConf(
+			this.artifactName,
+			this.branchName,
+			this.versionSuffix,
+			this.workDir,
+			additionalBuildArgs, 
+			this.dockerFile,
+			this.pullRegistry,
+			this.pullRegistryCredentialsId,
+			this.pushRegistry,
+			this.pushRegistryCredentialsId)
+	}
 
 	String toString()
 	{
