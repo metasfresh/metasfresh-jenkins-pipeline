@@ -16,7 +16,7 @@ void call(
 }
 
 void uploadCoverageResultsForCodacy(
-  final String gitCommitHash
+  final String gitCommitHash,
   final String codacyProjectTokenCredentialsId)
 {
   final String version='4.0.1'
