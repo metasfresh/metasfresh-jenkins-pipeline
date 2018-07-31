@@ -1,5 +1,0 @@
-
-Builds & publishes a docker image
-
-Needs to run on the node where the artifacts to be dockerized were just build.
-The respective filenames and directory layout needs to follow our conventions.
