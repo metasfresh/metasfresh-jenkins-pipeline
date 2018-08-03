@@ -19,8 +19,11 @@ void uploadCoverageResultsForCodacy(
   final String gitCommitHash,
   final String codacyProjectTokenCredentialsId)
 {
-  final String version='4.0.1'
-	sh "wget --quiet https://github.com/codacy/codacy-coverage-reporter/releases/download/${version}/codacy-coverage-reporter-${version}-assembly.jar"
+  final String version='4.0.2'
+
+  // get it from our own 3rd party repo; the github download stalls now and then
+  sh "wget --quiet https://repo.metasfresh.com/service/local/repositories/mvn-3rdparty/content/com/codacy/codacy-coverage-reporter/${version}/codacy-coverage-reporter-${version}-assembly.jar"
+	//sh "wget --quiet https://github.com/codacy/codacy-coverage-reporter/releases/download/${version}/codacy-coverage-reporter-${version}-assembly.jar"
 
 	final String jacocoReportGlob='**/jacoco.xml' // by default, the files would be in **/target/site/jacoco/jacoco.xml, but why make assumptions here..
   final String classpathParam = "-cp codacy-coverage-reporter-${version}-assembly.jar"
