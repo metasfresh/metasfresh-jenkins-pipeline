@@ -45,5 +45,5 @@ private String buildAndPush(final DockerConf dockerConf)
   //  sh "docker rmi ${imageName}:${latestTag}"
   //  sh "docker rmi ${imageNameWithTag}"
 
-  return "${dockerConf.pullRegistry}/${imageName}:${buildSpecificTag}"
+  return "${dockerConf.pushRegistry}/${imageName}:${buildSpecificTag}"
 }
