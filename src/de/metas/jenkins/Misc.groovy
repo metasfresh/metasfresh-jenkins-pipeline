@@ -190,7 +190,7 @@ String createReleaseLinkWithText(
 {
 	final String jobName='release_docker_images'
 	final String urlVersion = urlEncode(mkDockerTag(fullVersion))
-	final String description = 'lets you jump to a jenkins-job that will create and publish deployable docker images from this build'
+	final String description = 'lets you jump to a jenkins-job that will create and publish <b>deployable docker images</b> from this build'
 	
 	final String releaseLinkWithText = "<a href=\"https://jenkins.metasfresh.com/job/ops/job/${jobName}/parambuild/?VERSION_RELEASE=${urlVersion}&URL_APP_DIST=${artifactUrls['metasfresh-dist']}&URL_WEBAPI_JAR=${artifactUrls['metasfresh-webui']}&URL_WEBUI_FRONTEND=${artifactUrls['metasfresh-webui-frontend']}\"><b>this link</b></a> ${description}."
 	return releaseLinkWithText;
@@ -203,7 +203,7 @@ String createWeeklyReleaseLinkWithText(
 {
 	final String jobName = 'release_weekly_release_package'
 	final String urlVersion = urlEncode(mkDockerTag(releaseVersion))
-	final String description = 'lets you jump to a jenkins-job that will create the weekly release package from this build'
+	final String description = 'lets you jump to a jenkins-job that will create the <b>weekly release package</b> from this build'
 
 	final String releaseLinkWithText = "<a href=\"https://jenkins.metasfresh.com/job/ops/job/${jobName}/parambuild/?VERSION_RELEASE=${urlVersion}&URL_APP_DIST=${artifactUrls['metasfresh-dist']}&URL_WEBAPI_JAR=${artifactUrls['metasfresh-webui']}&URL_WEBUI_FRONTEND=${artifactUrls['metasfresh-webui-frontend']}\"><b>this link</b></a> ${description}."
 	return releaseLinkWithText;
