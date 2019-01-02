@@ -56,22 +56,6 @@ Map urlEncodeMapValues(final Map mapToEncode)
 }
 
 /**
-  * This method needs to be invoked within a `node` block (label=`linux`), because it uses the `sh` step`!
-  */
-String getCommitSha1()
-{
-  // getting the commit_sha1 like this is a workaround until https://issues.jenkins-ci.org/browse/JENKINS-26100 is done
-  // thanks to
-  // https://issues.jenkins-ci.org/browse/JENKINS-34455?focusedCommentId=256522&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-256522
-  // for the workaround
-  sh 'git rev-parse HEAD > git-commit-sha1.txt';
-  final commit_sha1 = readFile('git-commit-sha1.txt')
-                        .replaceAll('\\s','') // get rid of all whisespaces
-
-  return commit_sha1
-}
-
-/**
  * This method calls additional downstream jobs such as metasfresh-procurement and metasfresh-webui from metasfresh.
  * This method needs to be invoked within a `node` block (label=`linux`), because it uses the `sh` step`!
  *
