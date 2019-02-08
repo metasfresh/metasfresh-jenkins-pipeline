@@ -18,11 +18,27 @@ private String buildAndPush(final DockerConf dockerConf)
 	final String buildSpecificTag = misc.mkDockerTag("${dockerConf.branchName}-${dockerConf.versionSuffix}")
   final String latestTag = misc.mkDockerTag("${dockerConf.branchName}-LATEST")
 
+  // if our Dockerfile supports it, we can make sure that we don't use any cached base image for more than one day.
+  // thx to https://github.com/moby/moby/issues/1996#issuecomment-185872769
+  final String additionalCacheBustArg;
+  if(dockerConf.additionalBuildArgs.contains("CACHEBUST"))
+  {
+    additionalCacheBustArg = '' // assume that our called already specified this arg
+  }
+  else
+  {
+    final def dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd")
+    final def date = new Date()
+    final String currentDate = dateFormat.format(date)
+
+    additionalCacheBustArg = "--build-arg CACHEBUST=${currentDate}"
+  }
+
   def image
   docker.withRegistry("https://${dockerConf.pullRegistry}/v2/", dockerConf.pullRegistryCredentialsId)
   {
     // despite being within "withRegistry", it's still required to include the pullRegistry in the Dockerfile's FROM (unless the default is fine for you)
-    image = docker.build("${imageName}:${buildSpecificTag}", "--pull ${dockerConf.additionalBuildArgs} ${dockerConf.workDir}")
+    image = docker.build("${imageName}:${buildSpecificTag}", "--pull ${dockerConf.additionalBuildArgs} ${additionalCacheBustArg} ${dockerConf.workDir}")
   }
 
   docker.withRegistry("https://${dockerConf.pushRegistry}/v2/", dockerConf.pushRegistryCredentialsId)
