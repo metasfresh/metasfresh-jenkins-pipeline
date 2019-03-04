@@ -182,7 +182,7 @@ String createReleaseLinkWithText(
 		+ "&URL_APP_DIST=${artifactUrls['metasfresh-dist']}"
 		+ "&URL_WEBAPI_JAR=${artifactUrls['metasfresh-webui']}"
 		+ "&URL_WEBUI_FRONTEND=${artifactUrls['metasfresh-webui-frontend']}"
-		+ dockerImages['metasfresh-e2e'] ? "&DOCKER_IMAGE_E2E=${urlEncode(dockerImages['metasfresh-e2e'])}" : ''
+		+ (dockerImages['metasfresh-e2e'] ? "&DOCKER_IMAGE_E2E=${urlEncode(dockerImages['metasfresh-e2e'])}" : '')
 
 	final String releaseLinkWithText = "<a href=\"${jobUrl}\"><b>this link</b></a> ${description}."
 	return releaseLinkWithText;
