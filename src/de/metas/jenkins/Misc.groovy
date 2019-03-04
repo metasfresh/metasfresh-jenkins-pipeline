@@ -177,7 +177,7 @@ String createReleaseLinkWithText(
 {
 	final String description = 'lets you jump to a jenkins-job that will create and publish <b>deployable docker images</b> from this build'
 
-	return createReleaseLinkWithText(
+	return createReleaseLinkWithText0(
 		'release_docker_images'/*jobName*/, 
 		fullVersion, 
 		description, 
@@ -193,7 +193,7 @@ String createWeeklyReleaseLinkWithText(
 {
 	final String description = 'lets you jump to a jenkins-job that will create the <b>weekly release package</b> from this build'
 
-	return createReleaseLinkWithText(
+	return createReleaseLinkWithText0(
 		'release_weekly_release_package'/*jobName*/, 
 		releaseVersion, 
 		description, 
@@ -201,7 +201,7 @@ String createWeeklyReleaseLinkWithText(
 		dockerImages)
 }
 
-private String createReleaseLinkWithText(
+private String createReleaseLinkWithText0(
 	final String jobName, 
 	final String version, 
 	final String description,
