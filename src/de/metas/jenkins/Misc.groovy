@@ -168,27 +168,43 @@ String retrieveEffectiveBranchName(final String metasFreshRepoName, final String
   * Also see https://github.com/metasfresh/mf15-platform/issues/40
   */
 String createReleaseLinkWithText(
-	final String releaseVersion, /* MF_RELEASE_VERSION */
+	final String releaseVersion /* MF_RELEASE_VERSION */,
 	final String fullVersion,
-	final Map artifactUrls /* MF_ARTIFACT_URLS */ )
+	final Map artifactUrls /* MF_ARTIFACT_URLS */,
+	final Map dockerImages=[:] /* MF_DOCKER_IMAGES */ )
 {
 	final String jobName='release_docker_images'
 	final String urlVersion = urlEncode(mkDockerTag(fullVersion))
 	final String description = 'lets you jump to a jenkins-job that will create and publish <b>deployable docker images</b> from this build'
 	
-	final String releaseLinkWithText = "<a href=\"https://jenkins.metasfresh.com/job/ops/job/${jobName}/parambuild/?VERSION_RELEASE=${urlVersion}&URL_APP_DIST=${artifactUrls['metasfresh-dist']}&URL_WEBAPI_JAR=${artifactUrls['metasfresh-webui']}&URL_WEBUI_FRONTEND=${artifactUrls['metasfresh-webui-frontend']}\"><b>this link</b></a> ${description}."
+	final String jobUrl="https://jenkins.metasfresh.com/job/ops/job/${jobName}/parambuild/"
+		+ "?VERSION_RELEASE=${urlVersion}"
+		+ "&URL_APP_DIST=${artifactUrls['metasfresh-dist']}"
+		+ "&URL_WEBAPI_JAR=${artifactUrls['metasfresh-webui']}"
+		+ "&URL_WEBUI_FRONTEND=${artifactUrls['metasfresh-webui-frontend']}"
+		+ dockerImages['metasfresh-e2e'] ? "&DOCKER_IMAGE_E2E=${urlEncode(dockerImages['metasfresh-e2e'])}" : ''
+
+	final String releaseLinkWithText = "<a href=\"${jobUrl}\"><b>this link</b></a> ${description}."
 	return releaseLinkWithText;
 }
 
 String createWeeklyReleaseLinkWithText(
-	final String releaseVersion, /* MF_RELEASE_VERSION */
+	final String releaseVersion /* MF_RELEASE_VERSION */,
 	final String fullVersion,
-	final Map artifactUrls /* MF_ARTIFACT_URLS */ )
+	final Map artifactUrls /* MF_ARTIFACT_URLS */,
+	final Map dockerImages=[:] /* MF_DOCKER_IMAGES */ )
 {
 	final String jobName = 'release_weekly_release_package'
 	final String urlVersion = urlEncode(mkDockerTag(releaseVersion))
 	final String description = 'lets you jump to a jenkins-job that will create the <b>weekly release package</b> from this build'
 
-	final String releaseLinkWithText = "<a href=\"https://jenkins.metasfresh.com/job/ops/job/${jobName}/parambuild/?VERSION_RELEASE=${urlVersion}&URL_APP_DIST=${artifactUrls['metasfresh-dist']}&URL_WEBAPI_JAR=${artifactUrls['metasfresh-webui']}&URL_WEBUI_FRONTEND=${artifactUrls['metasfresh-webui-frontend']}\"><b>this link</b></a> ${description}."
+	final String jobUrl="https://jenkins.metasfresh.com/job/ops/job/${jobName}/parambuild/"
+		+ "?VERSION_RELEASE=${urlVersion}"
+		+ "&URL_APP_DIST=${artifactUrls['metasfresh-dist']}"
+		+ "&URL_WEBAPI_JAR=${artifactUrls['metasfresh-webui']}"
+		+ "&URL_WEBUI_FRONTEND=${artifactUrls['metasfresh-webui-frontend']}"
+		+ dockerImages['metasfresh-e2e'] ? "&DOCKER_IMAGE_E2E=${urlEncode(dockerImages['metasfresh-e2e'])}" : ''
+
+	final String releaseLinkWithText = "<a href=\"${jobUrl}\"><b>this link</b></a> ${description}."
 	return releaseLinkWithText;
 }
