@@ -11,7 +11,7 @@ class MetasfreshVersionInfo implements Serializable
     final String ediDockerImage;
     final String e2eDockerImage;
 
-    DockerConf(
+	MetasfreshVersionInfo(
 		String metasfreshVersion,
 		String procurementWebuiVersion,
 		String webuiApiVersion,
