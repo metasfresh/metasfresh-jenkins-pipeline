@@ -12,7 +12,11 @@ void call(
 	// get the report for jenkins
   jacoco exclusionPattern: '**/src/main/java-gen' // collect coverage results for jenkins
 
-	uploadCoverageResultsForCodacy(gitCommitHash, codacyProjectTokenCredentialsId)
+  echo "!!!!!!!!!!!!!!!!!"
+  echo "Invocation to uploadCoverageResultsForCodacy is commented out in metasfresh-jenkins-pipeline/vars/publishJacocoReports.groovy because it threw an NPE"
+  echo "We tried with both versions 4.0.2 and 6.0.0"
+  //uploadCoverageResultsForCodacy(gitCommitHash, codacyProjectTokenCredentialsId)
+  echo "!!!!!!!!!!!!!!!!!"
 }
 
 void uploadCoverageResultsForCodacy(
