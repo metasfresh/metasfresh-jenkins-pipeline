@@ -19,7 +19,7 @@ void uploadCoverageResultsForCodacy(
   final String gitCommitHash,
   final String codacyProjectTokenCredentialsId)
 {
-  final String version='4.0.2'
+  final String version='6.0.0'
 
   // get it from our own 3rd party repo; the github download stalls now and then
   sh "wget --quiet https://repo.metasfresh.com/service/local/repositories/mvn-3rdparty/content/com/codacy/codacy-coverage-reporter/${version}/codacy-coverage-reporter-${version}-assembly.jar"
