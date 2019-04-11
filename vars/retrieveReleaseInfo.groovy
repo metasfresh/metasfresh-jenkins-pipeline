@@ -11,7 +11,7 @@ String call(final String branchName)
   echo "Attempting to retrive the latest release-info.properties for effectiveBranchName=${effectiveBranchName}"
   nodeIfNeeded('linux', {
     // use -O so a possible stale file is overwritten
-    sh "wget https://raw.githubusercontent.com/metasfresh/metasfresh-release-info/${effectiveBranchName}/release-info.properties -O release-info.properties"
+    sh "wget https://raw.githubusercontent.com/metasfresh/metasfresh-release-info/${effectiveBranchName}/release-info.properties --no-check-certificate -O release-info.properties"
     // note that readProperties also needs to be within the same node block t make sure we actually have access to the downloaded file
     final Properties props = readProperties file: 'release-info.properties'
 
