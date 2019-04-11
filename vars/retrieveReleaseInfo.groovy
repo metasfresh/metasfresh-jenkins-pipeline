@@ -14,10 +14,10 @@ String call(final String branchName)
     //sh "wget https://raw.githubusercontent.com/metasfresh/metasfresh-release-info/${effectiveBranchName}/release-info.properties --no-check-certificate -O release-info.properties"
     // note that readProperties also needs to be within the same node block t make sure we actually have access to the downloaded file
 
-    dir('release-info') 
+    sh "git clone --depth 1 https://github.com/metasfresh/metasfresh-release-info.git -b ${effectiveBranchName}"
+    dir('metasfresh-release-info') 
     {
-        sh "git clone --depth 1 https://github.com/metasfresh/metasfresh-release-info.git -b ${branchName}"
-        final Properties props = readProperties file: 'metasfresh-release-info/release-info.properties'
+        final Properties props = readProperties file: 'release-info.properties'
         final String releaseVersion = props."release.version"
         echo "Succeeded to load the following props: ${props}; return only release.version=${releaseVersion} for now as noone uses the other(s)."
         return releaseVersion

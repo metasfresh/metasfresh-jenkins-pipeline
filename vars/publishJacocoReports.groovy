@@ -3,7 +3,7 @@
 import de.metas.jenkins.Misc
 
 /**
-  *	Collect the test coverage results collected so far.
+  *	Aggregate the test coverage results collected so far and upload them to codacy
   */
 void call(
   final String gitCommitHash,
