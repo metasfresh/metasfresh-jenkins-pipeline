@@ -11,8 +11,9 @@ String call(final String branchName)
   echo "Attempting to retrive the latest release-info.properties for effectiveBranchName=${effectiveBranchName}"
   nodeIfNeeded('linux', {
   
-    deleteDir 'metasfresh-release-info'
-    sh "git clone --depth 1 https://github.com/metasfresh/metasfresh-release-info.git -b ${effectiveBranchName}"
+    sh label: 'Delete dir metasfresh-release-info if exists', returnStatus: true, script: 'rm -r metasfresh-release-info'
+    sh label: "Clone current metasfresh-release-info for ${effectiveBranchName}", script: "git clone --depth 1 https://github.com/metasfresh/metasfresh-release-info.git -b ${effectiveBranchName}"
+    
     dir('metasfresh-release-info') 
     {
         final Properties props = readProperties file: 'release-info.properties'
