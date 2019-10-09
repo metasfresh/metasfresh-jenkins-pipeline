@@ -2,7 +2,7 @@ package.de.metas.jenkins
 
 def call(final String mvnRepoBaseURL, String mvnRepoName)
 {
-	withCredentials([usernameColonPassword(credentialsId: 'nexus_jenkins', variable: 'NEXUS_LOGIN')])
+	withCredentials([usernameColonPassword(credentialsId: 'nexus.metasfresh.com_jenkins', variable: 'NEXUS_LOGIN')])
 	{
 		if(!isRepoExists(mvnRepoBaseURL, mvnRepoName))
 		{
