@@ -54,7 +54,7 @@ void createRepo(final String mvnRepoBaseURL, final String mvnRepoName)
 """
 
 		// # nexus ignored application/json
-		final String createGroupCommand =  "curl -v --header \"Content-Type: text/plain\" -X POST -u ${NEXUS_LOGIN} ${mvnRepoBaseURL}/service/rest/v1/script/create_maven_repo/run -d \"${createGroupPayload}\""
+		final String createGroupCommand =  "curl -v --header \"Content-Type: text/plain\" -X POST -u ${NEXUS_LOGIN} ${mvnRepoBaseURL}/service/rest/v1/script/create_maven_repo/run -d \'${createGroupPayload}\'"
 		sh "${createGroupCommand}"
 
 }
