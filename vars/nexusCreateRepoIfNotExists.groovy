@@ -40,7 +40,7 @@ void createRepo(final String mvnRepoBaseURL, final String mvnRepoName)
 		
 		
 		echo "Create the repository ${mvnRepoName}-releases and group ${mvnRepoName}";
-		final String createGroupPayload = "{
+		final String createGroupPayload = """{
   "mvn_reponame": "${mvnRepoName}-releases",
   "write_policy": "allow_once",
   "version_policy": "release",
@@ -51,7 +51,7 @@ void createRepo(final String mvnRepoBaseURL, final String mvnRepoName)
   "mvn_groupname": "${mvnRepoName}",
   "group_members": ["maven-public", "${mvnRepoName}-releases"]
 }
-"
+"""
 
 		// # nexus ignored application/json
 		final String createGroupCommand =  "curl -v --header \"Content-Type: text/plain\" -X POST -u ${NEXUS_LOGIN} ${mvnRepoBaseURL}rest/v1/script/create_maven_repo/run -d \"${createGroupPayload}\""
