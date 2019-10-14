@@ -16,7 +16,7 @@ boolean isRepoExists(final String mvnRepoBaseURL, String mvnRepoName)
 	echo "Check if the nexus repository ${mvnRepoName} exists";
 
 	// check if there is a repository for ur branch
-	final String checkForRepoCommand = "curl --silent -X GET -u ${NEXUS_LOGIN} ${mvnRepoBaseURL}/service/local/repositories | grep '<id>${mvnRepoName}-releases</id>'";
+	final String checkForRepoCommand = "curl --silent -X GET -u ${NEXUS_LOGIN} ${mvnRepoBaseURL}/service/rest/v1/repositories | grep '${mvnRepoName}-releases'";
 	final grepExitCode = sh returnStatus: true, script: checkForRepoCommand;
 	final repoExists = grepExitCode == 0;
 
