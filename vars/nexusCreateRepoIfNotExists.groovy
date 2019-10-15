@@ -26,7 +26,7 @@ boolean isRepoExists(final String mvnRepoBaseURL, String mvnRepoName)
 
 void createRepo(final String mvnRepoBaseURL, final String mvnRepoName)
 {
-		final String PUBLIC_REPO_BASE_URL="https://nexus.metasfresh.com";
+		final String PUBLIC_REPO_BASE_URL="https://repo.metasfresh.com";
 
 		// create a repo group that contains both the 3rd-party stuff and the locally build artifacts
 		//  this reposity will be used by the build
