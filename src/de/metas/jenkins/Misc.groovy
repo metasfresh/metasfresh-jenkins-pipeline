@@ -4,11 +4,14 @@ package de.metas.jenkins;
  * According to the documentation at https://docs.docker.com/engine/reference/commandline/tag/ :
  * A tag name must be valid ASCII and may contain lowercase and uppercase letters, digits, underscores, periods and dashes. A tag name may not start with a period or a dash and may contain a maximum of 128 characters.
  */
-String mkDockerTag(String input)
+String mkDockerTag(final String input)
 {
- 	return input
+ 	final String onlyLegalChars = input
  		.replaceFirst('^[#\\.]', '') // delete the first letter if it is a period or dash
  		.replaceAll('[^a-zA-Z0-9_#\\.]', '_'); // replace everything that's not allowed with an underscore
+
+	// Thx https://stackoverflow.com/a/15713996/1012103
+	return onlyLegalChars.drop(onlyLegalChars.length() - 128); // if the onlyLegalchars is longer than 128 chars, then only get the last 128 of that string
 }
 
 /**
