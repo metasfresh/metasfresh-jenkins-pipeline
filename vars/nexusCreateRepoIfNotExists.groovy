@@ -47,7 +47,7 @@ void createRepo(final String mvnRepoBaseURL, final String mvnRepoName)
   "layout_policy": "strict",
   "cleanup_policy": "cleanup_maven_30d",
   "blobname": "default",
-  "strict_content_validation": "true",
+  "strict_content_validation": "false",
   "mvn_groupname": "${mvnRepoName}",
   "group_members": ["maven-public", "${mvnRepoName}-releases"]
 }
