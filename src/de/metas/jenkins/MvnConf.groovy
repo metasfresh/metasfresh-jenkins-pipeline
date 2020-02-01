@@ -74,12 +74,12 @@ class MvnConf implements Serializable
 
 	String getDeployRepoURL()
 	{
-		return "${this.mvnDeployRepoBaseURL}/content/repositories/${this.mvnRepoName}-releases"
+		return "${this.mvnDeployRepoBaseURL}/repository/${this.mvnRepoName}-releases"
 	}
 
 	String getResolveRepoURL()
 	{
-		return "${this.mvnResolveRepoBaseURL}/content/repositories/${this.mvnRepoName}"
+		return "${this.mvnResolveRepoBaseURL}/repository/${this.mvnRepoName}"
 	}
 
 	/**
