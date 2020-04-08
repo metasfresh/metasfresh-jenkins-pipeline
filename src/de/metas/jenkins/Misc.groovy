@@ -23,7 +23,7 @@ String mkReleaseDate()
 }
 
 /**
-  * For a given veresion string such as "5.23.1-23+master" this method returns "5.23" (i.e. the major and minor).
+  * For a given version string such as "5.23.1-23+master" this method returns "5.23" (i.e. the major and minor).
   */
 String extractReleaseVersion(final String version)
 {
