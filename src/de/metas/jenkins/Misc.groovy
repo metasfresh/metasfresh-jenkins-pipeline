@@ -49,7 +49,7 @@ String urlEncode(final String urlPart)
   */
 Map urlEncodeMapValues(final Map mapToEncode)
 {
-  echo "urlEncodeMapValues - mapEntriesToEncode=${mapEntriesToEncode}"
+  echo "urlEncodeMapValues - mapToEncode=${mapToEncode}"
   final def mapEntriesToEncode = mapToEncode.entrySet().toArray();
   final def result = [:];
   for ( int i = 0; i < mapEntriesToEncode.length; i++ )
