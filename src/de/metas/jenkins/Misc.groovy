@@ -49,12 +49,12 @@ String urlEncode(final String urlPart)
   */
 Map urlEncodeMapValues(final Map mapToEncode)
 {
-  echo "urlEncodeMapValues - mapToEncode=${mapToEncode}"
+  // echo "urlEncodeMapValues - mapToEncode=${mapToEncode}"
   final def mapEntriesToEncode = mapToEncode.entrySet().toArray();
   final def result = [:];
   for ( int i = 0; i < mapEntriesToEncode.length; i++ )
   {
-    echo "urlEncodeMapValues - i=${i}, mapEntriesToEncode[i]=${mapEntriesToEncode[i]}"
+    // echo "urlEncodeMapValues - i=${i}, mapEntriesToEncode[i]=${mapEntriesToEncode[i]}"
     result.put(mapEntriesToEncode[i].key, urlEncode(mapEntriesToEncode[i].value));
   }
   return result;
@@ -217,7 +217,7 @@ private String createReleaseLinkWithText0(
 	final String distUrlParam = "URL_APP_DIST=${artifactUrls['metasfresh-dist']}"
 	final String apiUrlParam = "URL_WEBAPI_JAR=${artifactUrls['metasfresh-webui']}"
 	final String frontendUrlParam = "URL_WEBUI_FRONTEND=${artifactUrls['metasfresh-webui-frontend']}"
-	final String e2eUrlParam = dockerImages['metasfresh-e2e'] ? "DOCKER_IMAGE_E2E=${urlEncode(dockerImages['metasfresh-e2e'])}" : ''
+	final String e2eUrlParam = (dockerImages && dockerImages['metasfresh-e2e']) ? "DOCKER_IMAGE_E2E=${urlEncode(dockerImages['metasfresh-e2e'])}" : ''
 
 	final String jobUrl="https://jenkins.metasfresh.com/job/ops/job/${jobName}/parambuild/?${versionUrlParam}&${distUrlParam}&${apiUrlParam}&${frontendUrlParam}&${e2eUrlParam}"
 
