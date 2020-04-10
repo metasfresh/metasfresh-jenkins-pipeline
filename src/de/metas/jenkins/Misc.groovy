@@ -213,7 +213,7 @@ private String createReleaseLinkWithText0(
 	final Map artifactUrls /* MF_ARTIFACT_URLS */,
 	final Map dockerImages=[:] /* MF_DOCKER_IMAGES */)
 {
-	final STring webuiApiRUL = artifactUrls['metasfresh-webui-api'] ?: artifactUrls['metasfresh-webui']; // metasfresh-webui is deprecated
+	final String webuiApiRUL = artifactUrls['metasfresh-webui-api'] ?: artifactUrls['metasfresh-webui']; // metasfresh-webui is deprecated
 	final String apiUrlParam = "URL_WEBAPI_JAR=${webuiApiRUL}"
 	
 	final String versionUrlParam = "VERSION_RELEASE=${urlEncode(mkDockerTag(version))}"
