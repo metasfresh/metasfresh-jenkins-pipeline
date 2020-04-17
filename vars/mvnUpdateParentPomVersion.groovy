@@ -19,5 +19,5 @@ def call(final MvnConf mvnConf)
     final String processOnlyParentParams="-DprocessParent=true -DprocessDependencies=false -DprocessDependencyManagement=false -DprocessProperties=false"
 
     echo "mvnUpdateParentPomVersion: Resolve the parent version range"
-    sh "mvn --settings ${mvnConf.settingsFile} --file ${mvnConf.pomFile} --non-recursive --batch-mode -DallowSnapshots=false -DgenerateBackupPoms=true ${processOnlyParentParams} ${mvnConf.resolveParams} ${VERSIONS_PLUGIN}:resolve-ranges"
+    sh "mvn --settings ${mvnConf.settingsFile} --debug --file ${mvnConf.pomFile} --non-recursive --batch-mode -DallowSnapshots=false -DgenerateBackupPoms=true ${processOnlyParentParams} ${mvnConf.resolveParams} ${VERSIONS_PLUGIN}:resolve-ranges"
 }
