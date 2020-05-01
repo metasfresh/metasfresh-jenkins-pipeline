@@ -47,6 +47,8 @@ class DockerConf implements Serializable
 
 	final String pushRegistryCredentialsId
 
+	final boolean pullOnBuild
+
 	/**
 	  * Optional
 	  */
@@ -62,7 +64,8 @@ class DockerConf implements Serializable
 			String pullRegistry = 'docker.metasfresh.com',
 			String pullRegistryCredentialsId = 'nexus.metasfresh.com_jenkins',
 			String pushRegistry = 'nexus.metasfresh.com:6001',
-			String pushRegistryCredentialsId = 'nexus.metasfresh.com_jenkins')
+			String pushRegistryCredentialsId = 'nexus.metasfresh.com_jenkins',
+			boolean pullOnBuild = true)
 	{
 		this.artifactName = artifactName
 		this.branchName = branchName
@@ -74,6 +77,7 @@ class DockerConf implements Serializable
 		this.pullRegistryCredentialsId = pullRegistryCredentialsId
 		this.pushRegistry = pushRegistry
 		this.pushRegistryCredentialsId = pushRegistryCredentialsId
+		this.pullOnBuild = pullOnBuild
 	}
 
 	DockerConf withArtifactName(String altArtifactName)
@@ -88,7 +92,8 @@ class DockerConf implements Serializable
 			this.pullRegistry,
 			this.pullRegistryCredentialsId,
 			this.pushRegistry,
-			this.pushRegistryCredentialsId)
+			this.pushRegistryCredentialsId,
+			this.pullOnBuild)
 	}
 
 	DockerConf withWorkDir(String altWorkDir)
@@ -103,7 +108,8 @@ class DockerConf implements Serializable
 			this.pullRegistry,
 			this.pullRegistryCredentialsId,
 			this.pushRegistry,
-			this.pushRegistryCredentialsId)
+			this.pushRegistryCredentialsId,
+			this.pullOnBuild)
 	}
 	
 	DockerConf withAdditionalBuildArgs(String additionalBuildArgs)
@@ -118,8 +124,11 @@ class DockerConf implements Serializable
 			this.pullRegistry,
 			this.pullRegistryCredentialsId,
 			this.pushRegistry,
-			this.pushRegistryCredentialsId)
+			this.pushRegistryCredentialsId,
+			this.pullOnBuild)
 	}
+
+
 
 	String toString()
 	{

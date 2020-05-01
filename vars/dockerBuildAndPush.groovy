@@ -35,10 +35,17 @@ private String buildAndPush(final DockerConf dockerConf)
   }
 
   def image
-  docker.withRegistry("https://${dockerConf.pullRegistry}/v2/", dockerConf.pullRegistryCredentialsId)
+  if(dockerConf.pullOnBuild)
   {
-    // despite being within "withRegistry", it's still required to include the pullRegistry in the Dockerfile's FROM (unless the default is fine for you)
-    image = docker.build("${imageName}:${buildSpecificTag}", "--pull ${dockerConf.additionalBuildArgs} ${additionalCacheBustArg} ${dockerConf.workDir}")
+    docker.withRegistry("https://${dockerConf.pullRegistry}/v2/", dockerConf.pullRegistryCredentialsId)
+    {
+      // despite being within "withRegistry", it's still required to include the pullRegistry in the Dockerfile's FROM (unless the default is fine for you)
+      image = docker.build("${imageName}:${buildSpecificTag}", "--pull ${dockerConf.additionalBuildArgs} ${additionalCacheBustArg} ${dockerConf.workDir}")
+    }
+  }
+  else
+  {
+    image = docker.build("${imageName}:${buildSpecificTag}", "${dockerConf.additionalBuildArgs} ${additionalCacheBustArg} ${dockerConf.workDir}")
   }
 
   docker.withRegistry("https://${dockerConf.pushRegistry}/v2/", dockerConf.pushRegistryCredentialsId)
