@@ -70,7 +70,8 @@ void writeDockerTagsOfMapValues(final Map mavenVersions, final String branchName
   final def resultToWrite = '';
   for ( int i = 0; i < mapEntriesToEncode.length; i++ )
   {
-	resultToWrite = resultToWrite + "docker-tag.${mapEntriesToEncode[i].key}=${mkDockerTag(mapEntriesToEncode[i].value, branchName)}\n";
+	final def dockerTag = mkDockerTag("${branchName}-${mapEntriesToEncode[i].value}")
+	resultToWrite = resultToWrite + "docker-tag.${mapEntriesToEncode[i].key}=${dockerTag}\n";
   }
   writeFile encoding: 'UTF-8', file: targetFileName, text: resultToWrite
 }
