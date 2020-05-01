@@ -128,7 +128,21 @@ class DockerConf implements Serializable
 			this.pullOnBuild)
 	}
 
-
+	DockerConf withPullOnBuild(boolean pullOnBuild)
+	{
+		return new DockerConf(
+			this.artifactName,
+			this.branchName,
+			this.versionSuffix,
+			this.workDir,
+			this.additionalBuildArgs, 
+			this.dockerFile,
+			this.pullRegistry,
+			this.pullRegistryCredentialsId,
+			this.pushRegistry,
+			this.pushRegistryCredentialsId,
+			pullOnBuild)
+	}
 
 	String toString()
 	{
