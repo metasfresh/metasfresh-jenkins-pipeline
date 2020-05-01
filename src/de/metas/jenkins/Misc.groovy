@@ -47,10 +47,10 @@ String urlEncode(final String urlPart)
   *
   * Thanks to https://stackoverflow.com/questions/40159258/impossibility-to-iterate-over-a-map-using-groovy-within-jenkins-pipeline
   */
-Map urlEncodeMapValues(final Map mapToEncode)
+Map urlEncodeMapValues(final Map mavenVersions)
 {
-  // echo "urlEncodeMapValues - mapToEncode=${mapToEncode}"
-  final def mapEntriesToEncode = mapToEncode.entrySet().toArray();
+  // echo "urlEncodeMapValues - mavenVersions=${mavenVersions}"
+  final def mapEntriesToEncode = mavenVersions.entrySet().toArray();
   final def result = [:];
   for ( int i = 0; i < mapEntriesToEncode.length; i++ )
   {
@@ -65,8 +65,8 @@ Map urlEncodeMapValues(final Map mapToEncode)
   */
 void writeDockerTagsOfMapValues(final Map mavenVersions, final String branchName, final targetFileName)
 {
-  // echo "writeDockerTagsOfMapValues - mapToEncode=${mapToEncode}"
-  final def mapEntriesToEncode = mapToEncode.entrySet().toArray();
+  // echo "writeDockerTagsOfMapValues - mavenVersions=${mavenVersions}"
+  final def mapEntriesToEncode = mavenVersions.entrySet().toArray();
   final def resultToWrite = '';
   for ( int i = 0; i < mapEntriesToEncode.length; i++ )
   {
