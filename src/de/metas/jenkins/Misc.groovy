@@ -61,6 +61,21 @@ Map urlEncodeMapValues(final Map mapToEncode)
 }
 
 /**
+  * Iterates the given map and writes a properties file with the given map's keys - prefixed with "docker-tag." and the given map's values' corresponding docker tags.
+  */
+void writeDockerTagsOfMapValues(final Map mavenVersions, final String branchName, final targetFileName)
+{
+  // echo "writeDockerTagsOfMapValues - mapToEncode=${mapToEncode}"
+  final def mapEntriesToEncode = mapToEncode.entrySet().toArray();
+  final def resultToWrite = '';
+  for ( int i = 0; i < mapEntriesToEncode.length; i++ )
+  {
+	resultToWrite = resultToWrite + "docker-tag.${mapEntriesToEncode[i].key}=${mkDockerTag(mapEntriesToEncode[i].value, branchName)}\n";
+  }
+  writeFile encoding: 'UTF-8', file: targetFileName, text: resultToWrite
+}
+
+/**
  * This method calls additional downstream jobs such as metasfresh-procurement and metasfresh-webui from metasfresh.
  * This method needs to be invoked within a `node` block (label=`linux`), because it uses the `sh` step`!
  *
