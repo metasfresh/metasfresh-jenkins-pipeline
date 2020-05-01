@@ -65,7 +65,7 @@ Map urlEncodeMapValues(final Map mavenVersions)
   */
 void writeDockerTagsOfMapValues(final Map mavenVersions, final String branchName, final targetFileName)
 {
-  // echo "writeDockerTagsOfMapValues - mavenVersions=${mavenVersions}"
+  echo "writeDockerTagsOfMapValues - mavenVersions=${mavenVersions}"
   final def mapEntriesToEncode = mavenVersions.entrySet().toArray();
   final def resultToWrite = '';
   for ( int i = 0; i < mapEntriesToEncode.length; i++ )
@@ -73,6 +73,8 @@ void writeDockerTagsOfMapValues(final Map mavenVersions, final String branchName
 	final def dockerTag = mkDockerTag("${branchName}-${mapEntriesToEncode[i].value}")
 	resultToWrite = resultToWrite + "docker-tag.${mapEntriesToEncode[i].key}=${dockerTag}\n";
   }
+  echo """writeDockerTagsOfMapValues - going to write the following to target file ${targetFileName}:
+${resultToWrite}"""
   writeFile encoding: 'UTF-8', file: targetFileName, text: resultToWrite
 }
 
