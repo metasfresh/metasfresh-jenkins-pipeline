@@ -49,7 +49,7 @@ void createRepo(final String mvnRepoBaseURL, final String mvnRepoName)
   "blobname": "default",
   "strict_content_validation": "false",
   "mvn_groupname": "${mvnRepoName}",
-  "group_members": ["${mvnRepoName}-releases", "maven-public"]
+  "group_members": ["${mvnRepoName}-releases", "mvn-3rdparty-all"]
 }
 """
 
