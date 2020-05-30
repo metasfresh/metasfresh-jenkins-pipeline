@@ -2,6 +2,12 @@ package de.metas.jenkins
 
 class DockerConf implements Serializable
 {
+	public static final String PUSH_REGISTRY = 'nexus.metasfresh.com:6001'
+	public static final String PUSH_REGISTRY_CREDENTIALS_ID = 'nexus.metasfresh.com_jenkins'
+	
+	public static final String PULL_REGISTRY = 'docker.metasfresh.com'
+	public static final String PULL_REGISTRY_CREDENTIALS_ID = 'nexus.metasfresh.com_jenkins'
+	
 	/**
 	  * Mandatory. Examples: metasfresh-app, metasfresh-material-dispo.
 		* This string will be made docker-compliant if necessary. Also, <code>metasfresh/</code> will be prepended
@@ -61,10 +67,10 @@ class DockerConf implements Serializable
 			String workDir = '.',
 			String additionalBuildArgs = '',
 			String dockerFile = 'Dockerfile',
-			String pullRegistry = 'docker.metasfresh.com',
-			String pullRegistryCredentialsId = 'nexus.metasfresh.com_jenkins',
-			String pushRegistry = 'nexus.metasfresh.com:6001',
-			String pushRegistryCredentialsId = 'nexus.metasfresh.com_jenkins',
+			String pullRegistry = PULL_REGISTRY,
+			String pullRegistryCredentialsId = PULL_REGISTRY_CREDENTIALS_ID,
+			String pushRegistry = PUSH_REGISTRY,
+			String pushRegistryCredentialsId = PUSH_REGISTRY_CREDENTIALS_ID,
 			boolean pullOnBuild = true)
 	{
 		this.artifactName = artifactName
