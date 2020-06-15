@@ -61,6 +61,10 @@ class MvnConf implements Serializable
 		this.mvnDeployRepoBaseURL = mvnDeployRepoBaseURL
 	}
 
+	/*
+	comment this out; trying to approach the error
+	expected to call Script1.build but wound up catching de.metas.jenkins.MvnConf.toString; see: https://jenkins.io/redirect/pipeline-cps-method-mismatches/
+	that aparently prevents me from calling parent-pom when building the branch secondary_opinion_uat
 	String toString()
 	{
 		return """MvnConf[
@@ -71,6 +75,7 @@ class MvnConf implements Serializable
   mvnDeployRepoBaseURL=${mvnDeployRepoBaseURL}
 ]""";
 	}
+	*/
 
 	String getDeployRepoURL()
 	{
