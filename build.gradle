@@ -1,0 +1,16 @@
+plugins {
+    id "groovy"
+}
+
+group = "de.metas.jenkins"
+version = "10.0.0"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.codehaus.groovy:groovy-all:2.5.0"
+    testCompile "com.lesfurets:jenkins-pipeline-unit:1.1"
+    testCompile "junit:junit:4.12"
+}
