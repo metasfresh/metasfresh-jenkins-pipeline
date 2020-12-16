@@ -9,7 +9,8 @@ String call(final DockerConf dockerConf)
 
 private String buildAndPush(final DockerConf dockerConf)
 {
-  echo "buildAndPush is called with dockerConf=${dockerConf}"
+  final String dockerConfStr = dockerConf.toString();
+  echo "buildAndPush is called with dockerConf=${dockerConfStr}"
 
 	final def misc = new de.metas.jenkins.Misc()
 
@@ -37,6 +38,7 @@ private String buildAndPush(final DockerConf dockerConf)
   def image
   if(dockerConf.pullOnBuild)
   {
+    echo 'dockerConf.pullOnBuild=true, so we log in and build using "--pull"'
     docker.withRegistry("https://${dockerConf.pullRegistry}/v2/", dockerConf.pullRegistryCredentialsId)
     {
       // despite being within "withRegistry", it's still required to include the pullRegistry in the Dockerfile's FROM (unless the default is fine for you)
@@ -45,6 +47,7 @@ private String buildAndPush(final DockerConf dockerConf)
   }
   else
   {
+    echo 'dockerConf.pullOnBuild=false, so we build without "--pull"'
     image = docker.build("${imageName}:${buildSpecificTag}", "${dockerConf.additionalBuildArgs} ${additionalCacheBustArg} ${dockerConf.workDir}")
   }
 
