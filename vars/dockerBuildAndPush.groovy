@@ -42,12 +42,14 @@ private String buildAndPush(final DockerConf dockerConf)
     docker.withRegistry("https://${dockerConf.pullRegistry}/v2/", dockerConf.pullRegistryCredentialsId)
     {
       // despite being within "withRegistry", it's still required to include the pullRegistry in the Dockerfile's FROM (unless the default is fine for you)
+      echo "going to invoke docker.build(\"${imageName}:${buildSpecificTag}\", \"--pull ${dockerConf.additionalBuildArgs} ${additionalCacheBustArg} ${dockerConf.workDir}\")"
       image = docker.build("${imageName}:${buildSpecificTag}", "--pull ${dockerConf.additionalBuildArgs} ${additionalCacheBustArg} ${dockerConf.workDir}")
     }
   }
   else
   {
     echo 'dockerConf.pullOnBuild=false, so we build without "--pull"'
+    echo "going to invoke docker.build(\"${imageName}:${buildSpecificTag}\", \"${dockerConf.additionalBuildArgs} ${additionalCacheBustArg} ${dockerConf.workDir}\")"
     image = docker.build("${imageName}:${buildSpecificTag}", "${dockerConf.additionalBuildArgs} ${additionalCacheBustArg} ${dockerConf.workDir}")
   }
 
