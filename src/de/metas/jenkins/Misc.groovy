@@ -248,17 +248,28 @@ private String createReleaseLinkWithText0(
 
 boolean isAnyFileChanged(final Map scmVars)
 {
-	def anyFileChanged
+	if(!scmVars.GIT_COMMIT)	{
+
+		echo "scmVars.GIT_COMMIT not set; -> assume something must have changed"
+		return true;
+	}
+	if(!scmVars.GIT_PREVIOUS_SUCCESSFUL_COMMIT)	{
+
+		echo "scmVars.GIT_PREVIOUS_SUCCESSFUL_COMMIT not set; -> assume something must have changed"
+		return true;
+	}
+
     try {
+
       def vgitout = sh(returnStdout: true, script: "git diff --name-only ${scmVars.GIT_PREVIOUS_SUCCESSFUL_COMMIT} ${scmVars.GIT_COMMIT} .").trim()
       echo "git diff output (modified files):\n>>>>>\n${vgitout}\n<<<<<"
-      anyFileChanged = !vgitout.isEmpty()
+      def anyFileChanged = !vgitout.isEmpty()
       // see if anything at all changed in this folder
       echo "Any file changed compared to last build: ${anyFileChanged}"
-    } catch (ignored) {
-      echo "git diff error => assume something must have changed"
-      anyFileChanged = true
+	  return anyFileChanged
     }
-
-	return anyFileChanged
+	catch (ignored) {
+      echo "git diff error; -> assume something must have changed"
+      return true;
+    }
 }
