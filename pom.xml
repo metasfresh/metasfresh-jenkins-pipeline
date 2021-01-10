@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>de.metas.jenkins</groupId>
+    <artifactId>de.metas.jenkins</artifactId>
+
+    <description>We don't intend to build or deploy this; it's just so we can work on the groovy files in an IDE.
+        Tanks to https://stackoverflow.com/a/51859571/1012103
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.cloudbees</groupId>
+            <artifactId>groovy-cps</artifactId>
+            <version>1.24</version>
+        </dependency>
+    </dependencies>
+</project>

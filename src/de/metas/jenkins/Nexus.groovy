@@ -1,205 +1,94 @@
-package.de.metas.jenkins
+package de.metas.jenkins
 
-class NexusClient implements Serializable
+/**
+ * If the docker-image's URL ends with LATEST, then invoke the nexus REST API to find the docker image's sha256.
+ * Without this, e.g. in the case of a "master_LATEST" image tag, we won't get the lastest image version
+ */
+String retrieveDockerUrlToUse(final String dockerRegImageAndTag)
 {
-	final String PUBLIC_REPO_BASE_URL="https://repo.metasfresh.com/content/repositories/";
-
-	final String mvnRepoBaseURL;
-	final String mvnRepoName;
-
-	NexusClient(
-			String mvnRepoBaseURL,
-			String mvnRepoName
-			)
+	// echo 'BEGIN retrieveDockerUrlToUse'
+	final String dockerUrlToUse
+	if(dockerRegImageAndTag.endsWith('LATEST'))
 	{
-		this.mvnRepoBaseURL = mvnRepoBaseURL
-		this.mvnRepoName = mvnRepoName
-	}
+		echo "retrieveDockerUrlToUse - docker image ends with '_LATEST'; -> will invoke nexus-search-API"
 
-	void createRepoIfNotExists()
-	{
-		if(isRepoExists())
+		final String[] dockerUrlParts = splitDockerUrl(dockerRegImageAndTag)
+
+		final String dockerRegistry =dockerUrlParts[0]
+		// echo "dockerRegistry=${dockerRegistry}"
+		final String dockerImage = dockerUrlParts[1]
+		// echo "dockerImage=${dockerImage}"
+		final String dockerTag = dockerUrlParts[2]
+		echo "dockerTag=${dockerTag}"
+
+		final def misc = new de.metas.jenkins.Misc()
+		def normalizedDockerTag = misc.mkDockerTag(dockerTag)
+		//echo "normalizedDockerTag=${normalizedDockerTag}"
+
+		final String dockerSha256 = invokeSearchAPI(dockerImage, normalizedDockerTag)
+		if(dockerSha256)
 		{
-			return;
+			dockerUrlToUse = "${dockerRegistry}/${dockerImage}:${normalizedDockerTag}@sha256:${dockerSha256}"
+			echo "retrieveDockerUrlToUse - Found sha256 for tag=${normalizedDockerTag}"
 		}
-		createRepo();
-	}
-
-	boolean isRepoExists()
-	{
-		withCredentials([usernameColonPassword(credentialsId: 'nexus_jenkins', variable: 'NEXUS_LOGIN')])
+		else
 		{
-			echo "Check if the nexus repository ${this.mvnRepoName} exists";
-
-			// check if there is a repository for ur branch
-			final String checkForRepoCommand = "curl --silent -X GET -u ${NEXUS_LOGIN} ${this.mvnRepoBaseURL}/service/local/repositories | grep '<id>${this.mvnRepoName}-releases</id>'";
-			final grepExitCode = sh returnStatus: true, script: checkForRepoCommand;
-			final repoExists = grepExitCode == 0;
-
-			echo "The nexus repository ${this.mvnRepoName} exists: ${repoExists}";
-			return repoExists;
-		}
-	}
-
-	void createRepo()
-	{
-		withCredentials([usernameColonPassword(credentialsId: 'nexus_jenkins', variable: 'NEXUS_LOGIN')])
-		{
-			echo "Create the repository ${this.mvnRepoName}-releases";
-			final String createHostedRepoPayload = """<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<repository>
-  <data>
-	<id>${this.mvnRepoName}-releases</id>
-	<name>${this.mvnRepoName}-releases</name>
-	<exposed>true</exposed>
-	<repoType>hosted</repoType>
-	<writePolicy>ALLOW_WRITE_ONCE</writePolicy>
-    <browseable>true</browseable>
-    <indexable>true</indexable>
-	<repoPolicy>RELEASE</repoPolicy>
-	<providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
-	<provider>maven2</provider>
-	<format>maven2</format>
-  </data>
-</repository>
-""";
-
-			// # nexus ignored application/json
-			final String createHostedRepoCommand =  "curl --silent -H \"Content-Type: application/xml\" -X POST -u ${NEXUS_LOGIN} -d \'${createHostedRepoPayload}\' ${this.mvnRepoBaseURL}/service/local/repositories"
-			sh "${createHostedRepoCommand}"
-
-			if(this.mvnRepoBaseURL != PUBLIC_REPO_BASE_URL)
+			final String fallbackDockerTag = 'master_LATEST'
+			final String fallbackDockerSha256 = invokeSearchAPI(dockerImage, fallbackDockerTag)
+			if(fallbackDockerSha256)
 			{
-				// we need it to have all the task/branch specific artifacts that were build on the public jenkins
-				echo "Create the repository ${this.mvnRepoName}-proxy";
-				final String createProxyRepoPayload = """<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<repository>
-  <data>
-	<id>${this.mvnRepoName}-proxy</id>
-	<name>${this.mvnRepoName}-proxy</name>
-	<exposed>true</exposed>
-	<repoType>proxy</repoType>
-	<writePolicy>READ_ONLY</writePolicy>
-    <browseable>true</browseable>
-    <indexable>true</indexable>
-	<repoPolicy>RELEASE</repoPolicy>
-	<checksumPolicy>WARN</checksumPolicy>
-	<downloadRemoteIndexes>true</downloadRemoteIndexes>
-	<providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
-	<provider>maven2</provider>
-	<format>maven2</format>
-	<remoteStorage>
-      <remoteStorageUrl>https://repo.metasfresh.com/content/repositories/${this.mvnRepoName}/</remoteStorageUrl>
-    </remoteStorage>
-  </data>
-</repository>
-""";
-
-				// # nexus ignored application/json
-				final String createProxyRepoCommand =  "curl --silent -H \"Content-Type: application/xml\" -X POST -u ${NEXUS_LOGIN} -d \'${createProxyRepoPayload}\' ${this.mvnRepoBaseURL}/service/local/repositories"
-				sh "${createProxyRepoCommand}"
+				dockerUrlToUse = "${dockerRegistry}/${dockerImage}:${fallbackDockerTag}@sha256:${fallbackDockerSha256}"
+				echo "retrieveDockerUrlToUse - !!! Found sha256 for fallback-tag=${fallbackDockerTag} !!!"
 			}
 			else
 			{
-				echo "SKIP creating a ${this.mvnRepoName}-proxy, because mvnRepoBaseURL=${PUBLIC_REPO_BASE_URL}"
+				error "retrieveDockerUrlToUse - !!! Found no sha256 to normalized tag=${normalizedDockerTag} or fallback-tag=${fallbackDockerTag} !!!"
 			}
-
-			// create a repo group that contains both the local/hosted repo and the remote/proxy repo
-			// this reposity will be used by the build
-			echo "Create the repository-group ${this.mvnRepoName}";
-			final String createGroupPayload = """<?xml version="1.0" encoding="UTF-8"?>
-<repo-group>
-  <data>
-    <repositories>
-      <repo-group-member>
-        <name>${this.mvnRepoName}-releases</name>
-        <id>${this.mvnRepoName}-releases</id>
-        <resourceURI>${this.mvnRepoBaseURL}/content/repositories/${this.mvnRepoName}-releases/</resourceURI>
-      </repo-group-member>
-      <repo-group-member>
-        <name>${this.mvnRepoName}-proxy</name>
-        <id>${this.mvnRepoName}-proxy</id>
-        <resourceURI>https://repo.metasfresh.com/content/repositories/${this.mvnRepoName}/</resourceURI>
-      </repo-group-member>
-	  <repo-group-member>
-        <name>mvn-3rdparty-private</name>
-        <id>mvn-3rdparty-private</id>
-        <resourceURI>${this.mvnRepoBaseURL}/content/repositories/mvn-3rdparty-private/</resourceURI>
-      </repo-group-member>
-      <!--
-          We need the following repo in the group to cover the case of a task branch that exists only in this repo and not in any upstream repo.
-          In that scenario, the "task"-proxy-repo will not work and be "blocked" by nexus, but everything required by the build will be available here.
-      -->
-	    <repo-group-member>
-        <name>mvn-master-proxy</name>
-        <id>mvn-master-proxy</id>
-        <resourceURI>https://repo.metasfresh.com/content/repositories/mvn-master/</resourceURI>
-      </repo-group-member>
-    </repositories>
-    <name>${this.mvnRepoName}</name>
-    <repoType>group</repoType>
-    <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
-    <exposed>true</exposed>
-    <id>${this.mvnRepoName}</id>
-	<provider>maven2</provider>
-	<format>maven2</format>
-  </data>
-</repo-group>
-"""
-
-			// # nexus ignored application/json
-			final String createGroupCommand =  "curl --silent -H \"Content-Type: application/xml\" -X POST -u ${NEXUS_LOGIN} -d \'${createGroupPayload}\' ${this.mvnRepoBaseURL}/service/local/repo_groups"
-			sh "${createGroupCommand}"
-
-			echo "Create the scheduled task to keep ${this.mvnRepoName}-releases from growing too big";
-
-	final String createSchedulePayload = """<?xml version="1.0" encoding="UTF-8"?>
-<scheduled-task>
-  <data>
-	<id>cleanup-repo-${this.mvnRepoName}-releases</id>
-	<enabled>true</enabled>
-	<name>Remove Releases from ${this.mvnRepoName}-releases</name>
-	<typeId>ReleaseRemoverTask</typeId>
-	<schedule>daily</schedule>
-	<startDate>${currentBuild.startTimeInMillis}</startDate>
-	<recurringTime>03:00</recurringTime>
-	<properties>
-      <scheduled-task-property>
-        <key>numberOfVersionsToKeep</key>
-        <value>3</value>
-      </scheduled-task-property>
-      <scheduled-task-property>
-        <key>indexBackend</key>
-        <value>false</value>
-      </scheduled-task-property>
-      <scheduled-task-property>
-        <key>repositoryId</key>
-        <value>${this.mvnRepoName}-releases</value>
-      </scheduled-task-property>
-	</properties>
-  </data>
-</scheduled-task>"""
-
-			// # nexus ignored application/json
-			final String createScheduleCommand =  "curl --silent -H \"Content-Type: application/xml\" -X POST -u ${NEXUS_LOGIN} -d \'${createSchedulePayload}\' ${this.mvnRepoBaseURL}/service/local/schedules"
-			sh "${createScheduleCommand}"
-		} // withCredentials
-	}
-
-	def deleteRepo()
-	{
-		withCredentials([usernameColonPassword(credentialsId: 'nexus_jenkins', variable: 'NEXUS_LOGIN')])
-		{
-			echo "Delete the repository ${this.mvnRepoName}";
-
-			final String deleteGroupCommand = "curl --silent -X DELETE -u ${NEXUS_LOGIN} ${this.mvnRepoBaseURL}/service/local/repo_groups/${this.mvnRepoName}"
-			sh "${deleteGroupCommand}"
-
-			final String deleteRepoCommand = "curl --silent -X DELETE -u ${NEXUS_LOGIN} ${this.mvnRepoBaseURL}/service/local/repositories/${this.mvnRepoName}-releases"
-			sh "${deleteRepoCommand}"
-
-			final String deleteScheduleCommand = "curl --silent -X DELETE -u ${NEXUS_LOGIN} ${this.mvnRepoBaseURL}/service/local/schedules/cleanup-repo-${this.mvnRepoName}-releases"
-			sh "${deleteScheduleCommand}"
 		}
 	}
+	else
+	{
+		dockerUrlToUse = dockerRegImageAndTag
+	}
+	echo "retrieveDockerUrlToUse - dockerUrlToUse=${dockerUrlToUse}"
+	// echo 'END retrieveDockerUrlToUse'
+	return dockerUrlToUse;
 }
+
+@NonCPS
+String[] splitDockerUrl(final String dockerRegImageAndTag)
+{
+	// echo 'BEGIN splitDockerUrl'
+	def dockerUrlRegExp = /^(?<registryWithPort>[^\:]*\:?[0-9]*)\/(?<image>[^\:]*):(?<tag>.*)$/
+	// echo "dockerRegImageAndTag=${dockerRegImageAndTag}; dockerUrlRegExp=${dockerUrlRegExp}"
+	def urlComponents = (dockerRegImageAndTag =~ /$dockerUrlRegExp/)[0]
+	// echo "urlComponents.size()=${urlComponents.size()}; urlComponents=${urlComponents}"
+
+	def dockerRegistry = urlComponents[1]
+	echo "splitDockerUrl - dockerRegistry=${dockerRegistry}"
+	def dockerImage = urlComponents[2]
+	echo "splitDockerUrl - dockerImage=${dockerImage}"
+	def dockerTag = urlComponents[3]
+	echo "splitDockerUrl - dockerTag=${dockerTag}"
+
+	def result = [dockerRegistry, dockerImage, dockerTag]
+	// echo "END splitDockerUrl; result=${result}"
+	return result
+}
+
+String invokeSearchAPI(String dockerImage, String normalizedDockerTag)
+{
+	// echo 'BEGIN invokeSearchAPI'
+	final def misc = new de.metas.jenkins.Misc();
+
+	// thx to https://chadmayfield.com/2018/09/01/pulling-artifacts-from-nexus-in-less-than-25-lines-of-bash/
+	final String nexusQueryUrl = "https://nexus.metasfresh.com/service/rest/v1/search/assets?docker.imageName=${misc.urlEncode(dockerImage)}&docker.imageTag=${misc.urlEncode(normalizedDockerTag)}"
+	final String curlCommand = "curl -s -X GET \"${nexusQueryUrl}\" -H \"accept: application/json\" | grep -Po '\"sha256\" *: .*' | awk -F '\"' '{print \$4}'"
+
+	final String dockerSha256 = sh label: 'Retrieve docker-image sha256', returnStdout: true, script: curlCommand
+	//echo "Retrieved docker-dockerSha256=${dockerSha256}"
+
+	// echo 'END invokeSearchAPI'
+	return dockerSha256
+}
+
