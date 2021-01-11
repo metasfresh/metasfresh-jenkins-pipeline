@@ -1,4 +1,4 @@
-package.de.metas.jenkins
+package de.metas.jenkins
 
 def call(final String mvnRepoBaseURL, String mvnRepoName)
 {
