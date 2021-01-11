@@ -54,7 +54,7 @@ String retrieveDockerUrlToUse(final String dockerRegImageAndTag)
 	}
 	echo "retrieveDockerUrlToUse - dockerUrlToUse=${dockerUrlToUse}"
 	echo 'END retrieveDockerUrlToUse'
-	return dockerUrlToUse;
+	return dockerUrlToUse.trim()
 }
 
 @NonCPS
