@@ -54,7 +54,7 @@ String retrieveDockerUrlToUse(final String dockerRegImageAndTag)
 	}
 	echo "retrieveDockerUrlToUse - dockerUrlToUse=${dockerUrlToUse}"
 	echo 'END retrieveDockerUrlToUse'
-	return dockerUrlToUse.trim()
+	return dockerUrlToUse
 }
 
 @NonCPS
@@ -91,6 +91,6 @@ String invokeSearchAPI(final String dockerImage, final String normalizedDockerTa
 	echo "Retrieved docker-dockerSha256=${dockerSha256}"
 
 	echo 'END invokeSearchAPI'
-	return dockerSha256
+	return dockerSha256 ? dockerSha256.trim() : ''
 }
 
