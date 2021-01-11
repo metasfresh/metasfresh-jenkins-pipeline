@@ -6,7 +6,9 @@ package de.metas.jenkins
  */
 String retrieveDockerUrlToUse(final String dockerRegImageAndTag)
 {
-	// echo 'BEGIN retrieveDockerUrlToUse'
+	echo 'BEGIN retrieveDockerUrlToUse'
+	//echo "retrieveDockerUrlToUse - dockerRegImageAndTag=${dockerRegImageAndTag}"
+
 	final String dockerUrlToUse
 	if(dockerRegImageAndTag.endsWith('LATEST'))
 	{
@@ -15,15 +17,15 @@ String retrieveDockerUrlToUse(final String dockerRegImageAndTag)
 		final String[] dockerUrlParts = splitDockerUrl(dockerRegImageAndTag)
 
 		final String dockerRegistry =dockerUrlParts[0]
-		// echo "dockerRegistry=${dockerRegistry}"
+		echo "dockerRegistry=${dockerRegistry}"
 		final String dockerImage = dockerUrlParts[1]
-		// echo "dockerImage=${dockerImage}"
+		echo "dockerImage=${dockerImage}"
 		final String dockerTag = dockerUrlParts[2]
 		echo "dockerTag=${dockerTag}"
 
 		final def misc = new de.metas.jenkins.Misc()
 		def normalizedDockerTag = misc.mkDockerTag(dockerTag)
-		//echo "normalizedDockerTag=${normalizedDockerTag}"
+		echo "normalizedDockerTag=${normalizedDockerTag}"
 
 		final String dockerSha256 = invokeSearchAPI(dockerImage, normalizedDockerTag)
 		if(dockerSha256)
@@ -51,34 +53,34 @@ String retrieveDockerUrlToUse(final String dockerRegImageAndTag)
 		dockerUrlToUse = dockerRegImageAndTag
 	}
 	echo "retrieveDockerUrlToUse - dockerUrlToUse=${dockerUrlToUse}"
-	// echo 'END retrieveDockerUrlToUse'
+	echo 'END retrieveDockerUrlToUse'
 	return dockerUrlToUse;
 }
 
 @NonCPS
 String[] splitDockerUrl(final String dockerRegImageAndTag)
 {
-	// echo 'BEGIN splitDockerUrl'
-	def dockerUrlRegExp = /^(?<registryWithPort>[^\:]*\:?[0-9]*)\/(?<image>[^\:]*):(?<tag>.*)$/
-	// echo "dockerRegImageAndTag=${dockerRegImageAndTag}; dockerUrlRegExp=${dockerUrlRegExp}"
-	def urlComponents = (dockerRegImageAndTag =~ /$dockerUrlRegExp/)[0]
-	// echo "urlComponents.size()=${urlComponents.size()}; urlComponents=${urlComponents}"
+	echo 'BEGIN splitDockerUrl'
+	final def dockerUrlRegExp = /^(?<registryWithPort>[^\:]*\:?[0-9]*)\/(?<image>[^\:]*):(?<tag>.*)$/
+	echo "dockerRegImageAndTag=${dockerRegImageAndTag}; dockerUrlRegExp=${dockerUrlRegExp}"
+	final def urlComponents = (dockerRegImageAndTag =~ /$dockerUrlRegExp/)[0]
+	echo "urlComponents.size()=${urlComponents.size()}; urlComponents=${urlComponents}"
 
-	def dockerRegistry = urlComponents[1]
+	final def dockerRegistry = urlComponents[1]
 	echo "splitDockerUrl - dockerRegistry=${dockerRegistry}"
-	def dockerImage = urlComponents[2]
+	final def dockerImage = urlComponents[2]
 	echo "splitDockerUrl - dockerImage=${dockerImage}"
-	def dockerTag = urlComponents[3]
+	final def dockerTag = urlComponents[3]
 	echo "splitDockerUrl - dockerTag=${dockerTag}"
 
 	def result = [dockerRegistry, dockerImage, dockerTag]
-	// echo "END splitDockerUrl; result=${result}"
+	echo "END splitDockerUrl; result=${result}"
 	return result
 }
 
-String invokeSearchAPI(String dockerImage, String normalizedDockerTag)
+String invokeSearchAPI(final String dockerImage, final String normalizedDockerTag)
 {
-	// echo 'BEGIN invokeSearchAPI'
+	echo 'BEGIN invokeSearchAPI'
 	final def misc = new de.metas.jenkins.Misc();
 
 	// thx to https://chadmayfield.com/2018/09/01/pulling-artifacts-from-nexus-in-less-than-25-lines-of-bash/
@@ -86,9 +88,9 @@ String invokeSearchAPI(String dockerImage, String normalizedDockerTag)
 	final String curlCommand = "curl -s -X GET \"${nexusQueryUrl}\" -H \"accept: application/json\" | grep -Po '\"sha256\" *: .*' | awk -F '\"' '{print \$4}'"
 
 	final String dockerSha256 = sh label: 'Retrieve docker-image sha256', returnStdout: true, script: curlCommand
-	//echo "Retrieved docker-dockerSha256=${dockerSha256}"
+	echo "Retrieved docker-dockerSha256=${dockerSha256}"
 
-	// echo 'END invokeSearchAPI'
+	echo 'END invokeSearchAPI'
 	return dockerSha256
 }
 
