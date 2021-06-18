@@ -1,6 +1,7 @@
 #!/usr/bin/groovy
 
 import de.metas.jenkins.DockerConf
+import de.metas.jenkins.Misc
 
 String call(final DockerConf dockerConf) {
     return buildAndPush(dockerConf)
@@ -10,8 +11,7 @@ private String buildAndPush(final DockerConf dockerConf) {
     final String dockerConfStr = dockerConf.toString();
     echo "buildAndPush is called with dockerConf=${dockerConfStr}"
 
-    final Misc misc = new de.metas.jenkins.Misc()
-
+    final Misc misc = new Misc()
 
     final String imageName = "metasfresh/${dockerConf.artifactName}"
     final String buildSpecificTag = misc.mkDockerTag("${dockerConf.branchName}-${dockerConf.versionSuffix}")
