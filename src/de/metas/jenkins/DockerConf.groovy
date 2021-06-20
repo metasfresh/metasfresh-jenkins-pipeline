@@ -155,7 +155,7 @@ class DockerConf implements Serializable
 			pullOnBuild)
 	}
 
-	DockerConf additionalDockerTag(String additionalDockerTag)
+	DockerConf addAdditionalDockerTag(String additionalDockerTag)
 	{
 		this.additionalDockerTags.add(additionalDockerTag)
 		return this

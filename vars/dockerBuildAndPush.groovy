@@ -64,6 +64,11 @@ private String buildAndPush(final DockerConf dockerConf) {
 
                 // if additional tags were given, then also push with those
                 for(String additionalDockerTag: dockerConf.additionalDockerTags) {
+                    if('latest'.equals(additionalDockerTag) || buildSpecificTag.equals(additionalDockerTag))
+                    {
+                        echo "We skip pushing this image with the additionalDockerTag=${additionalDockerTag} because that was already done."
+                        continue;
+                    }
                     echo "We also push this image with the additionalDockerTag=${additionalDockerTag}"
                     image.push(additionalDockerTag)
                 }
