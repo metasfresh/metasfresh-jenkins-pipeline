@@ -60,6 +60,11 @@ class DockerConf implements Serializable
 	  */
 	final String additionalBuildArgs
 
+	/**
+	 * Optional; the dockerBuildAndPush step will push the respective image also with the tags contained in this list
+	 */
+	final ArrayList additionalDockerTags = new ArrayList();
+	
 	DockerConf(
 			String artifactName,
 			String branchName,
@@ -150,6 +155,12 @@ class DockerConf implements Serializable
 			pullOnBuild)
 	}
 
+	DockerConf additionalDockerTag(String additionalDockerTag)
+	{
+		this.additionalDockerTags.add(additionalDockerTag)
+		return this
+	}
+	
 	String toString()
 	{
 		return """DockerConf[

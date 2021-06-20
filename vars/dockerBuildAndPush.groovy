@@ -56,10 +56,16 @@ private String buildAndPush(final DockerConf dockerConf) {
                 // Use uppercase because this way it's the same keyword that we use in maven.
                 // Downstream jobs might look for "LATEST" in their base image tag
                 image.push(latestTag)
-
+                
                 if (dockerConf.branchName == 'release') {
                     echo 'branchName is "release", therefore we also push this image with the "latest" tag'
                     image.push('latest');
+                }
+
+                // if additional tags were given, then also push with those
+                for(String additionalDockerTag: dockerConf.additionalDockerTags) {
+                    echo "We also push this image with the additionalDockerTag=${additionalDockerTag}"
+                    image.push(additionalDockerTag)
                 }
             }
 
