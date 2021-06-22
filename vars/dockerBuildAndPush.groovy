@@ -30,8 +30,15 @@ private String buildAndPush(final DockerConf dockerConf) {
         additionalCacheBustArg = "--build-arg CACHEBUST=${currentDate}"
     }
 
+    final String pullRegistry
+    if (''.equals(dockerConf.pullRegistry)) {
+        pullRegistry = ''
+    } else {
+        pullRegistry = "https://${dockerConf.pullRegistry}/v2/"
+    }
+
     def image
-    docker.withRegistry("https://${dockerConf.pullRegistry}/v2/", dockerConf.pullRegistryCredentialsId) {
+    docker.withRegistry(pullRegistry, dockerConf.pullRegistryCredentialsId) {
         // we log in, with and without pullOnBuild, because even if we don't force a --pull, there might be one. and we need to avoid the error
         // "toomanyrequests: You have reached your pull rate limit. You may increase the limit by authenticating and upgrading: https://www.docker.com/increase-rate-limit"
         if (dockerConf.pullOnBuild) {
@@ -48,31 +55,37 @@ private String buildAndPush(final DockerConf dockerConf) {
             image = docker.build("${imageName}:${buildSpecificTag}", "${dockerConf.additionalBuildArgs} ${additionalCacheBustArg} ${dockerConf.workDir}")
         }
     }
-    docker.withRegistry("https://${dockerConf.pushRegistry}/v2/", dockerConf.pushRegistryCredentialsId)
-            {
-                image.push(buildSpecificTag)
 
-                // Also publish a branch specific "LATEST".
-                // Use uppercase because this way it's the same keyword that we use in maven.
-                // Downstream jobs might look for "LATEST" in their base image tag
-                image.push(latestTag)
-                
-                if (dockerConf.branchName == 'release') {
-                    echo 'branchName is "release", therefore we also push this image with the "latest" tag'
-                    image.push('latest');
-                }
+    final String pushRegistry
+    if (''.equals(dockerConf.pushRegistry)) {
+        pushRegistry = ''
+    } else {
+        pushRegistry = "https://${dockerConf.pushRegistry}/v2/"
+    }
+    docker.withRegistry(pushRegistry, dockerConf.pushRegistryCredentialsId) {
+        
+        image.push(buildSpecificTag)
 
-                // if additional tags were given, then also push with those
-                for(String additionalDockerTag: dockerConf.additionalDockerTags) {
-                    if('latest'.equals(additionalDockerTag) || buildSpecificTag.equals(additionalDockerTag))
-                    {
-                        echo "We skip pushing this image with the additionalDockerTag=${additionalDockerTag} because that was already done."
-                        continue;
-                    }
-                    echo "We also push this image with the additionalDockerTag=${additionalDockerTag}"
-                    image.push(additionalDockerTag)
-                }
+        // Also publish a branch specific "LATEST".
+        // Use uppercase because this way it's the same keyword that we use in maven.
+        // Downstream jobs might look for "LATEST" in their base image tag
+        image.push(latestTag)
+
+        if (dockerConf.branchName == 'release') {
+            echo 'branchName is "release", therefore we also push this image with the "latest" tag'
+            image.push('latest');
+        }
+
+        // if additional tags were given, then also push with those
+        for (String additionalDockerTag : dockerConf.additionalDockerTags) {
+            if ('latest'.equals(additionalDockerTag) || buildSpecificTag.equals(additionalDockerTag)) {
+                echo "We skip pushing this image with the additionalDockerTag=${additionalDockerTag} because that was already done."
+                continue;
             }
+            echo "We also push this image with the additionalDockerTag=${additionalDockerTag}"
+            image.push(additionalDockerTag)
+        }
+    }
 
     // cleanup to avoid disk space issues
     //  sh "docker rmi ${imageName}:${latestTag}"
