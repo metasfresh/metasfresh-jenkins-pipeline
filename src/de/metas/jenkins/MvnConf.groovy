@@ -58,15 +58,19 @@ class MvnConf implements Serializable {
         this.mvnDeployRepoBaseURL = mvnDeployRepoBaseURL
     }
 
-    String toString() {
-        return """MvnConf[
-  pomFile=${pomFile},
-  settingsFile=${settingsFile},
-  mvnRepoName=${mvnRepoName},
-  mvnResolveRepoBaseURL=${mvnResolveRepoBaseURL},
-  mvnDeployRepoBaseURL=${mvnDeployRepoBaseURL}
-]""";
-    }
+// This toString() method causes problems in the area of "CPS".
+// Namely, our cucumber-tests are not executed and the message is
+// "expected to call Script5.build but wound up catching de.metas.jenkins.MvnConf.toString; see: https://jenkins.io/redirect/pipeline-cps-method-mismatches/"
+//    
+//    String toString() {
+//        return """MvnConf[
+//  pomFile=${pomFile},
+//  settingsFile=${settingsFile},
+//  mvnRepoName=${mvnRepoName},
+//  mvnResolveRepoBaseURL=${mvnResolveRepoBaseURL},
+//  mvnDeployRepoBaseURL=${mvnDeployRepoBaseURL}
+//]""";
+//    }
 
     String getDeployRepoURL() {
         return "${this.mvnDeployRepoBaseURL}/repository/${this.mvnRepoName}-releases"
