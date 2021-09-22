@@ -1,4 +1,4 @@
-package de.metas.jenkins;
+package de.metas.jenkins
 
 /**
  * According to the documentation at https://docs.docker.com/engine/reference/commandline/tag/ :
@@ -8,10 +8,10 @@ String mkDockerTag(final String input)
 {
  	final String onlyLegalChars = input
  		.replaceFirst('^[#\\.]', '') // delete the first letter if it is a period or dash
- 		.replaceAll('[^a-zA-Z0-9_#\\.]', '_'); // replace everything that's not allowed with an underscore
+ 		.replaceAll('[^a-zA-Z0-9_#\\.]', '_') // replace everything that's not allowed with an underscore
 
 	// Thx https://stackoverflow.com/a/15713996/1012103
-	return onlyLegalChars.drop(onlyLegalChars.length() - 128); // if the onlyLegalchars is longer than 128 chars, then only get the last 128 of that string
+	return onlyLegalChars.drop(onlyLegalChars.length() - 128) // if the onlyLegalchars is longer than 128 chars, then only get the last 128 of that string
 }
 
 /**
@@ -39,7 +39,7 @@ String urlEncode(final String urlPart)
 {
    final String encodedURLpart = java.net.URLEncoder.encode(urlPart, "UTF-8")
    echo "urlEncode: Encoded given urlPart=${urlPart} into ${encodedURLpart}"
-   return encodedURLpart;
+   return encodedURLpart
 }
 
 /**
@@ -50,14 +50,14 @@ String urlEncode(final String urlPart)
 Map urlEncodeMapValues(final Map mavenVersions)
 {
   // echo "urlEncodeMapValues - mavenVersions=${mavenVersions}"
-  final def mapEntriesToEncode = mavenVersions.entrySet().toArray();
-  final def result = [:];
+  final def mapEntriesToEncode = mavenVersions.entrySet().toArray()
+  final def result = [:]
   for ( int i = 0; i < mapEntriesToEncode.length; i++ )
   {
     // echo "urlEncodeMapValues - i=${i}, mapEntriesToEncode[i]=${mapEntriesToEncode[i]}"
-    result.put(mapEntriesToEncode[i].key, urlEncode(mapEntriesToEncode[i].value));
+    result.put(mapEntriesToEncode[i].key, urlEncode(mapEntriesToEncode[i].value))
   }
-  return result;
+  return result
 }
 
 /**
@@ -66,12 +66,12 @@ Map urlEncodeMapValues(final Map mavenVersions)
 void writeDockerTagsOfMapValues(final Map mavenVersions, final String branchName, final targetFileName)
 {
   echo "writeDockerTagsOfMapValues - mavenVersions=${mavenVersions}"
-  final def mapEntriesToEncode = mavenVersions.entrySet().toArray();
-  final def resultToWrite = '';
+  final def mapEntriesToEncode = mavenVersions.entrySet().toArray()
+  final def resultToWrite = ''
   for ( int i = 0; i < mapEntriesToEncode.length; i++ )
   {
 	final def dockerTag = mkDockerTag("${branchName}-${mapEntriesToEncode[i].value}")
-	resultToWrite = resultToWrite + "docker-tag.${mapEntriesToEncode[i].key}=${dockerTag}\n";
+	resultToWrite = resultToWrite + "docker-tag.${mapEntriesToEncode[i].key}=${dockerTag}\n" 
   }
   echo """writeDockerTagsOfMapValues - going to write the following to target file ${targetFileName}:
 ${resultToWrite}"""
@@ -101,7 +101,7 @@ Map invokeDownStreamJobs(
 {
 	echo "Invoking downstream job from folder=${jobFolderName} with preferred branch=${upstreamBranch}"
 
-	final String jobName = getEffectiveDownStreamJobName(jobFolderName, upstreamBranch);
+	final String jobName = getEffectiveDownStreamJobName(jobFolderName, upstreamBranch)
 
 	final buildResult = build job: jobName,
 		parameters: [
@@ -113,7 +113,7 @@ Map invokeDownStreamJobs(
 		], wait: wait
 
 	echo "Job invokation done; buildResult.getBuildVariables()=${buildResult.getBuildVariables()}"
-	return buildResult.getBuildVariables();
+	return buildResult.getBuildVariables()
 }
 
 String getEffectiveDownStreamJobNameInNodeBlock(final String jobFolderName, final String upstreamBranch)
@@ -131,7 +131,7 @@ String getEffectiveDownStreamJobName(final String jobFolderName, final String up
 {
   	// if this is not the master branch but a feature branch, we need to find out if the "BRANCH_NAME" job exists or not
   	//
-    final String effectiveBranchName = retrieveEffectiveBranchName(jobFolderName, upstreamBranch);
+    final String effectiveBranchName = retrieveEffectiveBranchName(jobFolderName, upstreamBranch)
     jobName = "${jobFolderName}/${effectiveBranchName}"
 
   	// I also tried
@@ -145,7 +145,7 @@ String getEffectiveDownStreamJobName(final String jobFolderName, final String up
   	// Jenkins.instance.getAllItems()
   	// but there I got a scurity exception and am not sure if an how I can have a SCM maintained script that is approved by an admin
 
-  	return jobName;
+  	return jobName
 }
 
 /**
@@ -161,7 +161,7 @@ String retrieveEffectiveBranchName(final String metasFreshRepoName, final String
   	// if this is not the master branch but a feature branch, we need to find out if the "BRANCH_NAME" job exists or not
   	//
   	// Here i'm not checking if the build job exists but if the respective branch on github exists. If the branch is there, then I assume that the multibranch plugin also created the job
-  	def exitCode;
+  	def exitCode
 
 	// We run this within a node to avoid the error saying:
 	// Required context class hudson.FilePath is missing
@@ -172,7 +172,7 @@ String retrieveEffectiveBranchName(final String metasFreshRepoName, final String
         exitCode = sh returnStatus: true, script: "git ls-remote --exit-code https://github.com/metasfresh/${metasFreshRepoName} ${branchName}"
     })
 
-    final String effectiveBranchName;
+    final String effectiveBranchName
   	if(exitCode == 0)
   	{
   		echo "Branch ${branchName} also exists in ${metasFreshRepoName}"
@@ -184,7 +184,7 @@ String retrieveEffectiveBranchName(final String metasFreshRepoName, final String
   		effectiveBranchName = 'master'
   	}
 
-    return effectiveBranchName;
+    return effectiveBranchName
 }
 
 /**
@@ -231,19 +231,19 @@ private String createReleaseLinkWithText0(
 	final Map artifactUrls /* MF_ARTIFACT_URLS */,
 	final Map dockerImages=[:] /* MF_DOCKER_IMAGES */)
 {
-	final String webuiApiRUL = artifactUrls['metasfresh-webui-api'] ?: artifactUrls['metasfresh-webui']; // metasfresh-webui is deprecated
+	final String webuiApiRUL = artifactUrls['metasfresh-webui-api'] ?: artifactUrls['metasfresh-webui'] // metasfresh-webui is deprecated
 	final String apiUrlParam = "URL_WEBAPI_JAR=${webuiApiRUL}"
 	
 	final String versionUrlParam = "VERSION_RELEASE=${urlEncode(mkDockerTag(version))}"
 	final String distUrlParam = "URL_APP_DIST=${artifactUrls['metasfresh-dist']}"
 	final String frontendUrlParam = "URL_WEBUI_FRONTEND=${artifactUrls['metasfresh-webui-frontend']}"
+	final String mobileUrlParam = "URL_MOBILE_FRONTEND=${artifactUrls['metasfresh-mobile-frontend']}"
 	final String e2eUrlParam = (dockerImages && dockerImages['metasfresh-e2e']) ? "DOCKER_IMAGE_E2E=${urlEncode(dockerImages['metasfresh-e2e'])}" : ''
-
-	final String jobUrl="https://jenkins.metasfresh.com/job/ops/job/${jobName}/parambuild/?${versionUrlParam}&${distUrlParam}&${apiUrlParam}&${frontendUrlParam}&${e2eUrlParam}"
-
+	
+	final String jobUrl="https://jenkins.metasfresh.com/job/ops/job/${jobName}/parambuild/?${versionUrlParam}&${distUrlParam}&${apiUrlParam}&${frontendUrlParam}&${mobileUrlParam}&${e2eUrlParam}"
 
 	final String releaseLinkWithText = "<a href=\"${jobUrl}\"><b>this link</b></a> ${description}."
-	return releaseLinkWithText;
+	return releaseLinkWithText
 }
 
 boolean isAnyFileChanged(final Map scmVars)
@@ -251,12 +251,12 @@ boolean isAnyFileChanged(final Map scmVars)
 	if(!scmVars.GIT_COMMIT)	{
 
 		echo "scmVars.GIT_COMMIT not set; -> assume something must have changed"
-		return true;
+		return true
 	}
 	if(!scmVars.GIT_PREVIOUS_SUCCESSFUL_COMMIT)	{
 
 		echo "scmVars.GIT_PREVIOUS_SUCCESSFUL_COMMIT not set; -> assume something must have changed"
-		return true;
+		return true
 	}
 
     try {
@@ -270,6 +270,6 @@ boolean isAnyFileChanged(final Map scmVars)
     }
 	catch (ignored) {
       echo "git diff error; -> assume something must have changed"
-      return true;
+      return true
     }
 }
