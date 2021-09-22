@@ -51,8 +51,8 @@ Map urlEncodeMapValues(final Map mavenVersions)
 {
   // echo "urlEncodeMapValues - mavenVersions=${mavenVersions}"
   final def mapEntriesToEncode = mavenVersions.entrySet().toArray()
-  final def result = [:]
-  for ( int i = 0; i < mapEntriesToEncode.length; i++ )
+	final def result = [:]
+	for ( int i = 0; i < mapEntriesToEncode.length; i++ )
   {
     // echo "urlEncodeMapValues - i=${i}, mapEntriesToEncode[i]=${mapEntriesToEncode[i]}"
     result.put(mapEntriesToEncode[i].key, urlEncode(mapEntriesToEncode[i].value))
@@ -67,8 +67,8 @@ void writeDockerTagsOfMapValues(final Map mavenVersions, final String branchName
 {
   echo "writeDockerTagsOfMapValues - mavenVersions=${mavenVersions}"
   final def mapEntriesToEncode = mavenVersions.entrySet().toArray()
-  final def resultToWrite = ''
-  for ( int i = 0; i < mapEntriesToEncode.length; i++ )
+	final def resultToWrite = ''
+	for ( int i = 0; i < mapEntriesToEncode.length; i++ )
   {
 	final def dockerTag = mkDockerTag("${branchName}-${mapEntriesToEncode[i].value}")
 	resultToWrite = resultToWrite + "docker-tag.${mapEntriesToEncode[i].key}=${dockerTag}\n" 
@@ -132,7 +132,7 @@ String getEffectiveDownStreamJobName(final String jobFolderName, final String up
   	// if this is not the master branch but a feature branch, we need to find out if the "BRANCH_NAME" job exists or not
   	//
     final String effectiveBranchName = retrieveEffectiveBranchName(jobFolderName, upstreamBranch)
-    jobName = "${jobFolderName}/${effectiveBranchName}"
+	jobName = "${jobFolderName}/${effectiveBranchName}"
 
   	// I also tried
   	// https://jenkins.metasfresh.com/job/metasfresh-multibranch/api/xml?tree=jobs[name]
@@ -173,7 +173,7 @@ String retrieveEffectiveBranchName(final String metasFreshRepoName, final String
     })
 
     final String effectiveBranchName
-  	if(exitCode == 0)
+	if(exitCode == 0)
   	{
   		echo "Branch ${branchName} also exists in ${metasFreshRepoName}"
   		effectiveBranchName = branchName
@@ -237,11 +237,15 @@ private String createReleaseLinkWithText0(
 	final String versionUrlParam = "VERSION_RELEASE=${urlEncode(mkDockerTag(version))}"
 	final String distUrlParam = "URL_APP_DIST=${artifactUrls['metasfresh-dist']}"
 	final String frontendUrlParam = "URL_WEBUI_FRONTEND=${artifactUrls['metasfresh-webui-frontend']}"
-	final String mobileUrlParam = "URL_MOBILE_FRONTEND=${artifactUrls['metasfresh-mobile-frontend']}"
 	final String e2eUrlParam = (dockerImages && dockerImages['metasfresh-e2e']) ? "DOCKER_IMAGE_E2E=${urlEncode(dockerImages['metasfresh-e2e'])}" : ''
 	
-	final String jobUrl="https://jenkins.metasfresh.com/job/ops/job/${jobName}/parambuild/?${versionUrlParam}&${distUrlParam}&${apiUrlParam}&${frontendUrlParam}&${mobileUrlParam}&${e2eUrlParam}"
-
+	String jobUrl = "https://jenkins.metasfresh.com/job/ops/job/${jobName}/parambuild/?${versionUrlParam}&${distUrlParam}&${apiUrlParam}&${frontendUrlParam}&${e2eUrlParam}"
+	
+	if(artifactUrls['metasfresh-mobile-frontend']) {
+		final String mobileUrlParam = "URL_MOBILE_FRONTEND=${artifactUrls['metasfresh-mobile-frontend']}"
+		jobUrl = "${jobUrl}&${mobileUrlParam}" 
+	}
+	
 	final String releaseLinkWithText = "<a href=\"${jobUrl}\"><b>this link</b></a> ${description}."
 	return releaseLinkWithText
 }
