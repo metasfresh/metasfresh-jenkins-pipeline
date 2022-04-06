@@ -12,10 +12,10 @@ def call(final MvnConf mvnConf)
     echo "mvnUpdateParentPomVersion is called with mvnConf=${mvnConf}"
 
     // make sure we know which plugin version we run
-    final String VERSIONS_PLUGIN='org.codehaus.mojo:versions-maven-plugin:2.5'
+    final String VERSIONS_PLUGIN='org.codehaus.mojo:versions-maven-plugin:2.10.0'
 
     // this method is *just* about the parent pom. don't do unexpected additional stuff
-    // don't process the dpendencies and dependencyManagement *section* of the pom
+    // don't process the dependencies and dependencyManagement *section* of the pom
     final String processOnlyParentParams="-DprocessParent=true -DprocessDependencies=false -DprocessDependencyManagement=false -DprocessProperties=false"
 
     echo "mvnUpdateParentPomVersion: Resolve the parent version range"
