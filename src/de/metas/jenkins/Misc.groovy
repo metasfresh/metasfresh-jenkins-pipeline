@@ -244,6 +244,24 @@ String createWeeklyReleaseLinkWithText(
 		"master")
 }
 
+String createWeeklyReleaseLinkWithTextAndBranch(
+		final String releaseVersion,
+		final String fullVersion,
+		final Map artifactUrls /* MF_ARTIFACT_URLS */,
+		final Map dockerImages=[:] /* MF_DOCKER_IMAGES */,
+		final String branch)
+{
+	final String description = 'lets you jump to a jenkins-job that will create the <b>weekly release package</b> from this build'
+
+	return createReleaseLinkWithText0(
+			'release_weekly_release_package'/*jobName*/,
+			releaseVersion,
+			description,
+			artifactUrls,
+			dockerImages,
+			branch)
+}
+
 private String createReleaseLinkWithText0(
 	final String jobName, 
 	final String version, 
