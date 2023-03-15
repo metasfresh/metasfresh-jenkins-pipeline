@@ -276,16 +276,18 @@ private String createReleaseLinkWithText0(
 	final String versionUrlParam = "VERSION_RELEASE=${urlEncode(mkDockerTag(version))}"
 	final String distUrlParam = "URL_APP_DIST=${artifactUrls['metasfresh-dist']}"
 	final String frontendUrlParam = "URL_WEBUI_FRONTEND=${artifactUrls['metasfresh-webui-frontend']}"
-	final String e2eUrlParam = (dockerImages && dockerImages['metasfresh-e2e']) ? "DOCKER_IMAGE_E2E=${urlEncode(dockerImages['metasfresh-e2e'])}" : ''
+	final String e2eUrlParam = (dockerImages && dockerImages['metasfresh-e2e']) ? "&DOCKER_IMAGE_E2E=${urlEncode(dockerImages['metasfresh-e2e'])}" : ''
 	final String branchParam = "GH_METASFRESH_DOCKER_BRANCH=${branch}"
 	
-	String jobUrl = "https://jenkins.metasfresh.com/job/ops/job/${jobName}/parambuild/?${versionUrlParam}&${distUrlParam}&${apiUrlParam}&${frontendUrlParam}&${e2eUrlParam}&${branchParam}"
+	String jobUrl = "https://jenkins.metasfresh.com/job/ops/job/${jobName}/parambuild/?${versionUrlParam}&${distUrlParam}&${apiUrlParam}&${frontendUrlParam}${e2eUrlParam}"
 	
 	if(artifactUrls['metasfresh-mobile-frontend']) {
 		final String mobileUrlParam = "URL_MOBILE_FRONTEND=${artifactUrls['metasfresh-mobile-frontend']}"
 		jobUrl = "${jobUrl}&${mobileUrlParam}" 
 	}
-	
+
+	jobUrl = "${jobUrl}&${branchParam}"
+
 	final String releaseLinkWithText = "<a href=\"${jobUrl}\"><b>this link</b></a> ${description}."
 	return releaseLinkWithText
 }
