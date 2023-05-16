@@ -44,7 +44,8 @@ String retrieveDockerUrlToUse(final String dockerRegImageAndTag)
 			}
 			else
 			{
-				error "retrieveDockerUrlToUse - !!! Found no sha256 to normalized tag=${normalizedDockerTag} or fallback-tag=${fallbackDockerTag} !!!"
+				// don't fail; the docker artifact might have been evicted
+				echo "retrieveDockerUrlToUse - !!! Found no sha256 to normalized tag=${normalizedDockerTag} or fallback-tag=${fallbackDockerTag} !!!"
 			}
 		}
 	}
