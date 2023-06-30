@@ -1,10 +1,10 @@
 package de.metas.jenkins
 
 class DockerConf implements Serializable {
-    public static final String PUSH_REGISTRY = 'nexus.metasfresh.com:6001'
+    public static final String PUSH_REGISTRY = 'dockertemp.metasfresh.com'
     public static final String PUSH_REGISTRY_CREDENTIALS_ID = 'nexus.metasfresh.com_jenkins'
 
-    public static final String PULL_REGISTRY = 'docker.metasfresh.com'
+    public static final String PULL_REGISTRY = 'dockertemp.metasfresh.com'
     public static final String PULL_REGISTRY_CREDENTIALS_ID = 'nexus.metasfresh.com_jenkins'
 
     /**
