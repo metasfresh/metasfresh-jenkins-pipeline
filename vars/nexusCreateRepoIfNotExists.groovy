@@ -46,7 +46,7 @@ void createRepo(final String mvnRepoBaseURL, final String mvnRepoName)
   "version_policy": "release",
   "layout_policy": "strict",
   "cleanup_policy": "cleanup_maven_30d",
-  "blobname": "created-by-jenkins",
+  "blobname": "maven-build-store",
   "strict_content_validation": "false",
   "mvn_groupname": "${mvnRepoName}",
   "group_members": ["${mvnRepoName}-releases", "mvn-3rdparty-all"]
